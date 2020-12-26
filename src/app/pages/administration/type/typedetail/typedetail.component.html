@@ -1,0 +1,153 @@
+<!--
+ * FusionSuite - Frontend
+ * Copyright (C) 2022 FusionSuite
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<ion-header>
+  <ion-toolbar>
+    <ion-title *ngIf="id === 0">Creation of a new type</ion-title>
+    <ion-title *ngIf="id > 0">{{name}}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-card *ngIf="id === 0">
+    <ion-card-header>
+      <ion-card-title>
+        <ion-icon name="cloud-upload-outline"></ion-icon>
+        Template import
+      </ion-card-title>
+    </ion-card-header>    
+    <ion-card-content>
+      <ion-item>
+        <ion-label position="stacked">Template file</ion-label>
+        <ion-input placeholder="Please select the template to import" type="file" accept="application/json" (change)="loadFileFromDevice($event)"></ion-input>
+      </ion-item>
+      <ion-item lines="none">
+        <ion-button (click)="createTemplate()">Create type</ion-button>
+      </ion-item>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title *ngIf="id === 0">
+        <ion-icon name="flask-outline"></ion-icon>
+        Manual creation
+      </ion-card-title>
+      <ion-card-title *ngIf="id > 0">
+        <ion-icon name="create-outline"></ion-icon>
+        Update the type
+      </ion-card-title>
+    </ion-card-header>    
+    <ion-card-content>
+      <form [formGroup]="checkoutForm" (ngSubmit)="onSubmit()">
+        <ion-grid>
+          <ion-row>
+            <ion-col>
+              <ion-item-group>
+                <ion-item-divider>
+                  <ion-label>Main information</ion-label>
+                </ion-item-divider>
+                <ion-item>
+                  <ion-label position="stacked">Name</ion-label>
+                  <ion-input placeholder="Please set the name of type here" type="text" formControlName="name"></ion-input>
+                </ion-item>
+              </ion-item-group>
+            </ion-col>
+            <ion-col *ngIf="checkoutForm && checkoutForm.controls.properties !== undefined" formArrayName="properties">
+              <ion-item-group>
+                <ion-item-divider>
+                  <ion-label>Properties and groupings</ion-label>
+                </ion-item-divider>
+                <!-- {{properties}} -->
+                <ion-list>
+                  <ion-list-header>
+                    <ion-label>Actions</ion-label>
+                  </ion-list-header>
+                  <ion-item lines="none">
+                    <ion-item button (click)="addGroup()" color="primary">
+                      <ion-icon name="add"></ion-icon>
+                      <ion-label>Create a new group</ion-label>
+                    </ion-item>
+                    <ion-item button (click)="addProperty()" color="primary" style="margin-left: 5px;">
+                      <ion-icon name="attach-outline"></ion-icon>
+                      <ion-label>Attach a new property</ion-label>
+                    </ion-item>
+                    <ion-item button color="secondary"  style="margin-left: 5px;">
+                      <ion-icon name="add"></ion-icon>
+                      <ion-label>Create a new property</ion-label>
+                    </ion-item>
+                  </ion-item>
+
+                  <!-- <ion-reorder-group (ionItemReorder)="reorderItems($event)" id="main" disabled="false">
+                    <ion-list-header color="light">
+                      <ion-item color="light">
+                        <ion-icon name="bookmarks-outline" slot="start"></ion-icon>
+                        <ion-label position="stacked">group name</ion-label>
+                        <ion-input value="Main"></ion-input>
+                      </ion-item>
+                    </ion-list-header>
+                    <ion-item *ngFor="let property of checkoutForm.controls.properties.controls; let i=index">
+                      <ion-label position="stacked">Property</ion-label>
+                      <ion-select interface="popover" [formControlName]="i">
+                        <ion-select-option *ngFor="let typepriority of typeProperties" [value]="typepriority.id">{{typepriority.name}}</ion-select-option>
+                      </ion-select>
+                      <ion-reorder slot="start">
+                      </ion-reorder>
+                    </ion-item>
+                    <ion-list-header color="light">
+                      <ion-item color="light">
+                        <ion-icon name="bookmarks-outline" slot="start"></ion-icon>
+                        <ion-label position="stacked">group name</ion-label>
+                        <ion-input value="Test 2"></ion-input>
+                      </ion-item>
+                    </ion-list-header>
+                  </ion-reorder-group> -->
+
+                  <ion-reorder-group (ionItemReorder)="reorderItems($event)" id="main2" disabled="false">
+                    <div *ngFor="let item of propertiesGroupsList; let i=index">
+                      <ion-item *ngIf="item._internalType === 'property'">
+                        <ion-label position="stacked">Property</ion-label>
+                        <ion-select interface="popover" [formControlName]="i">
+                          <ion-select-option *ngFor="let typepriority of typeProperties" [value]="typepriority.id">{{typepriority.name}}</ion-select-option>
+                        </ion-select>
+                        <ion-reorder slot="start">
+                        </ion-reorder>
+                        </ion-item>
+                      <ion-list-header color="light" *ngIf="item._internalType === 'group'">
+                        <ion-item color="light">
+                          <ion-icon name="bookmarks-outline" slot="start"></ion-icon>
+                          <ion-label position="stacked">Group</ion-label>
+                          <ion-input [formControlName]="i"></ion-input>
+                        </ion-item>
+                      </ion-list-header>
+                    </div>
+                  </ion-reorder-group>
+                </ion-list>
+              </ion-item-group>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col class="ion-text-center">
+              <ion-button type="submit" *ngIf="id === 0">Create this type</ion-button>
+              <ion-button type="submit" *ngIf="id > 0">Update this type</ion-button>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </form>
+    </ion-card-content>
+  </ion-card>
+</ion-content>

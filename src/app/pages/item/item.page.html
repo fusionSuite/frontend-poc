@@ -1,0 +1,163 @@
+<!--
+ * FusionSuite - Frontend
+ * Copyright (C) 2022 FusionSuite
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<ion-header>
+  <ion-toolbar>
+    <ion-grid>
+      <ion-row>
+        <ion-col size="2">
+          <ion-title>{{name}}</ion-title>
+          <p *ngIf="numberElements != ''" style="padding-inline-start: 20px;">
+            <fa-icon [icon]="['fas', 'quote-left']" size="lg"></fa-icon>
+            {{numberElements}} elements
+          </p>
+        </ion-col>
+        <ion-col size="8">
+          <ion-searchbar [(ngModel)]="searchText" debounce="500" (keyup.enter)="search($event)"></ion-searchbar>
+        </ion-col>
+        <ion-col size="2">
+          <ion-item lines="none">
+            <ion-avatar slot="start">
+              <img src="https://en.gravatar.com/userimage/13475082/fe1be3db6ddb66650678ce314497836b.jpg?d=identicon&f=y">
+            </ion-avatar>
+            <ion-label>
+              <ion-label>David Durieux</ion-label>
+            </ion-label>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-fab vertical="top" horizontal="end" edge slot="fixed">
+    <ion-fab-button [routerLink]="['detail/0']">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
+  <ion-grid>
+    <ion-row>
+      <ion-col size="2">
+        <!-- Manage the properties are type: list -->
+        <div *ngFor="let prop of getListProperties()">
+          <ion-list [class]="filtersClass[prop.id]">
+            <ion-item lines="none">
+              <ion-label style="font-weight: bold;" class="filters">{{prop.name}}</ion-label>
+            </ion-item>
+            <ion-item lines="none" *ngFor="let listvalue of prop.listvalues">
+              <ion-checkbox class="filters"></ion-checkbox>
+              <ion-label class="filters">{{listvalue.value}}</ion-label>
+            </ion-item>
+          </ion-list>
+          <ion-chip outline color="medium" *ngIf="prop.listvalues.length > 3" (click)="reverseFilterClass(prop.id)">
+            <ion-label *ngIf="filtersClass[prop.id] === 'hideContent'">
+              <ion-icon name="chevron-down-outline"></ion-icon>
+              Show more
+            </ion-label>
+            <ion-label *ngIf="filtersClass[prop.id] === 'showContent'">
+              <ion-icon name="chevron-up-outline"></ion-icon>
+              Show less
+            </ion-label>
+          </ion-chip>          
+        </div>
+      </ion-col>
+      <ion-col size="10">
+        <ion-grid>
+          <ion-row>
+            <ion-col>
+              <ion-grid>
+                <ion-row>
+                  <ion-col>
+                    <ion-button fill="clear" color="medium">
+                      <fa-icon [icon]="['fas', 'filter']" size="lg"></fa-icon>
+                    </ion-button>
+                    <ion-button fill="clear" color="medium">
+                      <fa-icon [icon]="['fas', 'bookmark']" size="lg"></fa-icon>
+                    </ion-button>
+                    <ion-button fill="clear" color="medium">
+                      <fa-icon [icon]="['fas', 'bell']" size="lg"></fa-icon>
+                    </ion-button>
+                    <ion-button fill="clear" color="medium">
+                      <fa-icon [icon]="['fas', 'trash-alt']" size="lg"></fa-icon>
+                    </ion-button>
+                  </ion-col>
+                  <ion-col>
+                    <ion-item lines="none">
+                      <ion-label>Sort by</ion-label>
+                      <ion-select placeholder="Select One" value="name">
+                        <ion-select-option value="name">Name</ion-select-option>
+                        <ion-select-option *ngFor="let prop of properties" value="{{prop.id}}">{{prop.name}}</ion-select-option>
+                      </ion-select>            
+                    </ion-item>
+                  </ion-col>
+                  <ion-col>
+                    <ion-item lines="none" button="false">
+                      <ion-button style="z-index: 3;" fill="clear" color="medium" [disabled]="!links.includes('rel=&quot;first&quot;')" (click)="loadLink('first')">
+                        <fa-icon [icon]="['fas', 'backward']" size="lg"></fa-icon>
+                      </ion-button>
+                      <ion-button style="z-index: 3;" fill="clear" color="medium" [disabled]="!links.includes('rel=&quot;prev&quot;')" (click)="loadLink('prev')">
+                        <fa-icon [icon]="['fas', 'play']" flip="horizontal" size="lg"></fa-icon>
+                      </ion-button>
+                      <ion-select interface="popover" value="100" style="width: 60px;">
+                        <ion-select-option value="10">10</ion-select-option>
+                        <ion-select-option value="50">50</ion-select-option>
+                        <ion-select-option value="100">100</ion-select-option>
+                        <ion-select-option value="200">200</ion-select-option>
+                        <ion-select-option value="500">500</ion-select-option>
+                        <ion-select-option value="990">990</ion-select-option>
+                      </ion-select>
+                      <ion-button style="z-index: 2;" fill="clear" color="medium" [disabled]="!links.includes('rel=&quot;next&quot;')" (click)="loadLink('next')">
+                        <fa-icon [icon]="['fas', 'play']" size="lg"></fa-icon>
+                      </ion-button>
+                      <ion-button style="z-index: 2;" fill="clear" color="medium" [disabled]="!links.includes('rel=&quot;last&quot;')" (click)="loadLink('last')">
+                        <fa-icon [icon]="['fas', 'forward']" size="lg"></fa-icon>
+                      </ion-button>
+                    </ion-item>
+                  </ion-col>
+                  <ion-col>
+                    <ion-button fill="outline" color="medium">
+                      <fa-icon [icon]="['fas', 'list']" size="lg"></fa-icon>
+                    </ion-button>
+                    <ion-button fill="clear" color="medium">
+                      <fa-icon [icon]="['fas', 'th-large']" size="lg"></fa-icon>
+                    </ion-button>
+                  </ion-col>
+                </ion-row>
+              </ion-grid>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+
+        <ion-list>
+          <ion-item>
+            <ion-checkbox></ion-checkbox>
+            <ion-label style="font-weight: bold;">Name</ion-label>
+            <ion-label style="font-weight: bold;" *ngFor="let prop of properties">{{prop.name}}</ion-label>
+          </ion-item>
+          <ion-item *ngFor="let item of items" [routerLink]="['view/' + item.id]">
+            <ion-checkbox></ion-checkbox>
+            <ion-label>{{item.name}}</ion-label>
+            <ion-label *ngFor="let prop of item.properties">{{prop.value}}</ion-label>
+          </ion-item>
+        </ion-list>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+</ion-content>

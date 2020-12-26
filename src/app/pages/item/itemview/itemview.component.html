@@ -1,0 +1,75 @@
+<!--
+ * FusionSuite - Frontend
+ * Copyright (C) 2022 FusionSuite
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<ion-header>
+  <ion-toolbar>
+    <ion-title *ngIf="id > 0">{{id}} - {{name}}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-card *ngIf="loaded">
+    <ion-card-content>
+      <ion-grid>
+        <ion-row>
+          <ion-col size="4">
+            <ion-item lines="none">
+              <ion-label color="primary" position="stacked">Created on</ion-label>
+              <ion-text>{{item.created_at}}</ion-text>
+            </ion-item>
+          </ion-col>
+          <ion-col size="4">
+            <ion-item lines="none">
+              <ion-label color="primary" position="stacked">Last update on</ion-label>
+              <ion-text>{{item.updated_at}}</ion-text>
+            </ion-item>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-card-content>
+  </ion-card>
+
+  <div *ngIf="loaded">
+    <ion-card>
+      <div *ngFor="let group of item.propertygroups">
+      <ion-card-header>
+        <ion-card-title>{{group.name}}</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-grid>
+          <ion-row>
+            <ion-col size="4" *ngFor="let property of filterProperties(group.properties, false)">
+              <ion-item lines="none" *ngIf="property.valuetype !== 'text'">
+                <ion-label color="primary" position="stacked">{{property.name}}</ion-label>
+                <ion-text *ngIf="property.valuetype !== 'text'">{{property.value}}</ion-text>
+              </ion-item>
+            </ion-col>
+          </ion-row>
+          <ion-row *ngFor="let property of filterProperties(group.properties, true)">
+            <ion-col *ngIf="property.valuetype === 'text'">
+              <ion-item lines="none">
+                <ion-label color="primary" position="stacked">{{property.name}}</ion-label>
+                <ion-text *ngIf="property.valuetype === 'text'" [innerHTML]="property.value"></ion-text>
+              </ion-item>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-card-content>
+    </div>
+    </ion-card>
+  </div>
+</ion-content>

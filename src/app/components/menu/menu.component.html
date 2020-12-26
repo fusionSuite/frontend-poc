@@ -1,0 +1,46 @@
+<!--
+ * FusionSuite - Frontend
+ * Copyright (C) 2022 FusionSuite
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+
+<!-- <ion-menu side="start" menuId="FusionMenu" contentId="main" type="overlay"> -->
+  <!-- <ion-header>
+    <ion-toolbar color="primary">
+      <ion-title>
+        FusionSuite
+      </ion-title>
+    </ion-toolbar>
+  </ion-header> -->
+  <ion-content>
+    <ion-toolbar>
+      <ion-title>
+        FusionSuite
+      </ion-title>
+    </ion-toolbar>
+    <ion-list>
+      <ion-item *ngFor="let item of getCreateType()" [routerLink]="['/type/0']" lines="none">
+        <span [ngClass]="{'activeMenu': currentMenu === item.name}">
+          <ion-label>{{item.name}}</ion-label>
+        </span>
+      </ion-item>
+      <ion-item *ngFor="let item of getTypes()" [routerLink]="['/items/' + item.id + '/' + item.name.replace(' ', '-')]" lines="none">
+        <span [ngClass]="{'activeMenu': currentMenu === item.name}">
+          <ion-label>{{item.name}}</ion-label>
+        </span>
+      </ion-item>
+    </ion-list>
+  </ion-content>
+<!-- </ion-menu> -->
