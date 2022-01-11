@@ -63,20 +63,28 @@ export class TypedetailComponent implements OnInit {
               let position = 0;
               for (let propertygroup of res['propertygroups']) {
                 let properties = this.checkoutForm.get('properties') as FormArray;
-                position += 1;
-                propertygroup._internalPosition = position;
-                propertygroup._internalType = 'group';
-                this.propertiesGroupsList.push(propertygroup);
-                properties.push(new FormControl(propertygroup.name));
+                properties.push(new FormControl(propertygroup['name']));
+                this.propertiesGroupsList.push({
+                  _internalPosition: (properties.length - 1),
+                  _internalType: 'group',
+                  name: propertygroup['name']
+                });
                 for (let propId of propertygroup.properties) {
-                  let property = res['properties'].find((item :any) => item.id === propId);
-                  position += 1;
-                  let properties = this.checkoutForm.get('properties') as FormArray;
-                  property._internalPosition = position;
-                  property._internalType = 'property';
-                  this.propertiesGroupsList.push(property);
-                  properties.push(new FormControl(property.id));
-
+                  let name = '';
+                  for (let prop of res['properties']) {
+                    if (prop.id === propId) {
+                      name = prop.name;
+                      continue;
+                    }
+                  }
+                  let property = this.checkoutForm.get('properties') as FormArray;
+                  property.push(new FormControl(propId));
+                  this.propertiesGroupsList.push({
+                    _internalPosition: (property.length - 1),
+                    _internalType: 'property',
+                    id: propId,
+                    name
+                  });
                 }
               }
             });
@@ -113,7 +121,8 @@ export class TypedetailComponent implements OnInit {
     properties.push(new FormControl(''));
     this.propertiesGroupsList.push({
       _internalPosition: (properties.length - 1),
-      _internalType: 'property'
+      _internalType: 'property',
+      id: 0
     });
   }
 

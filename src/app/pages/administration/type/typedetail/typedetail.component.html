@@ -121,7 +121,7 @@
                     <div *ngFor="let item of propertiesGroupsList; let i=index">
                       <ion-item *ngIf="item._internalType === 'property'">
                         <ion-label position="stacked">Property</ion-label>
-                        <ion-select interface="popover" [formControlName]="i">
+                        <ion-select interface="popover" [formControlName]="i" [value]="item.id">
                           <ion-select-option *ngFor="let typepriority of typeProperties" [value]="typepriority.id">{{typepriority.name}}</ion-select-option>
                         </ion-select>
                         <ion-reorder slot="start">
