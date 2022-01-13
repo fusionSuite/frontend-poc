@@ -20,6 +20,7 @@ import { HttpClient, HttpHeaders, HttpParams, HttpResponse } from '@angular/comm
 import { GlobalVarsService } from './global-vars.service';
 import {catchError, map} from 'rxjs/operators';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { SettingsService } from './settings.service';
 
 @Injectable({
   providedIn: 'root'
@@ -32,7 +33,8 @@ export class BackendService {
 
   constructor(
     private http: HttpClient, 
-    public globalVars: GlobalVarsService
+    public globalVars: GlobalVarsService,
+    private settingsService: SettingsService
     ) {
 
   }
@@ -42,7 +44,7 @@ export class BackendService {
       login: 'admin',
       password: 'admin',
     };
-    await this.http.post('http://127.0.0.1/FusionITSM/index.php/v1/token', data)
+    await this.http.post(this.settingsService.url + '/v1/token', data)
       .pipe(map((res :any) => {
         this.token = res['token'];
       }))
@@ -61,7 +63,7 @@ export class BackendService {
       params: new HttpParams(),
     };
 
-    return await this.http.get('http://127.0.0.1/FusionITSM/index.php/v1/cmdb/types', httpOptions)
+    return await this.http.get(this.settingsService.url + '/v1/cmdb/types', httpOptions)
       .pipe(map(res => {
         for (const type of Object.values(res)) {
           this.globalVars.types.push(type);
@@ -83,7 +85,7 @@ export class BackendService {
       params: new HttpParams(),
     };
 
-    return this.http.get('http://127.0.0.1/FusionITSM/index.php/v1/cmdb/typeproperties', httpOptions);
+    return this.http.get(this.settingsService.url + '/v1/cmdb/typeproperties', httpOptions);
   }
 
   public getType(id: number) {
@@ -98,7 +100,7 @@ export class BackendService {
       params: new HttpParams(),
     };
 
-    return this.http.get('http://127.0.0.1/FusionITSM/index.php/v1/cmdb/types/' + id, httpOptions);
+    return this.http.get(this.settingsService.url + '/v1/cmdb/types/' + id, httpOptions);
   }
 
   /**
@@ -118,18 +120,18 @@ export class BackendService {
       }),
       params: new HttpParams(),
     };
-    let ret :any = await this.http.post('http://127.0.0.1/FusionITSM/index.php/v1/cmdb/types', {name}, httpOptions).toPromise();
+    let ret :any = await this.http.post(this.settingsService.url + '/v1/cmdb/types', {name}, httpOptions).toPromise();
     if (ret['id']) {
       console.log(groups);
       let position = 1;
       for (let group of groups) {
         let propertiesOfGroup = [];
         for (let propertyId of group.properties) {
-          await this.http.post('http://127.0.0.1/FusionITSM/index.php/v1/cmdb/types/' + ret['id'] + '/property/' + propertyId, {}, httpOptions).toPromise();
+          await this.http.post(this.settingsService.url + '/v1/cmdb/types/' + ret['id'] + '/property/' + propertyId, {}, httpOptions).toPromise();
           propertiesOfGroup.push(propertyId);
         }
         // TODO create group
-        await this.http.post('http://127.0.0.1/FusionITSM/index.php/v1/cmdb/types/' + ret['id'] + '/propertygroups', {name: group.name, properties: propertiesOfGroup, position}, httpOptions).toPromise();
+        await this.http.post(this.settingsService.url + '/v1/cmdb/types/' + ret['id'] + '/propertygroups', {name: group.name, properties: propertiesOfGroup, position}, httpOptions).toPromise();
         position += 1;
       }
     }
@@ -148,7 +150,7 @@ export class BackendService {
       }),
       params: new HttpParams(),
     };
-    return this.http.post('http://127.0.0.1/FusionITSM/index.php/v1/cmdb/typeproperties', data, httpOptions);
+    return this.http.post(this.settingsService.url + '/v1/cmdb/typeproperties', data, httpOptions);
   }
 
   public async createItem(typeId :number, data :any) {
@@ -162,7 +164,7 @@ export class BackendService {
       }),
       params: new HttpParams(),
     };
-    let ret :any = await this.http.post('http://127.0.0.1/FusionITSM/index.php/v1/cmdb/types/' + typeId + '/items', data, httpOptions).toPromise();
+    let ret :any = await this.http.post(this.settingsService.url + '/v1/cmdb/types/' + typeId + '/items', data, httpOptions).toPromise();
     return ret['id'];
   }
 
@@ -181,7 +183,7 @@ export class BackendService {
     for (let param of params) {
       httpOptions.params = httpOptions.params.set(param['key'], param['value'])
     }
-    return await this.http.get('http://127.0.0.1/FusionITSM/index.php/v1/cmdb/types/' + typeId + '/items', httpOptions).toPromise();
+    return await this.http.get(this.settingsService.url + '/v1/cmdb/types/' + typeId + '/items', httpOptions).toPromise();
   }
 
   public getItem(id :number) {
@@ -196,7 +198,7 @@ export class BackendService {
       params: new HttpParams(),
     };
 
-    return this.http.get('http://127.0.0.1/FusionITSM/index.php/v1/cmdb/items/' + id, httpOptions);
+    return this.http.get(this.settingsService.url + '/v1/cmdb/items/' + id, httpOptions);
   }
 
   /**

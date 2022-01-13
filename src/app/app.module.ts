@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import { NgModule } from '@angular/core';
+import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { RouteReuseStrategy } from '@angular/router';
 
@@ -32,6 +32,7 @@ import { FaIconLibrary, FontAwesomeModule } from '@fortawesome/angular-fontaweso
 import { fas } from '@fortawesome/free-solid-svg-icons';
 import { far } from '@fortawesome/free-regular-svg-icons';
 import { fab } from '@fortawesome/free-brands-svg-icons';
+import { SettingsService } from './services/settings.service';
 
 @NgModule({
     declarations: [
@@ -51,6 +52,12 @@ import { fab } from '@fortawesome/free-brands-svg-icons';
         { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
         BackendService,
         HttpClient,
+        {
+          provide: APP_INITIALIZER,
+          useFactory: (setting: SettingsService) => function() {return setting.getSetting()},
+          deps: [SettingsService],
+          multi: true
+        },
     ],
     bootstrap: [AppComponent]
 })
