@@ -6,18 +6,19 @@
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Affero General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import { Component, OnInit } from '@angular/core';
 import { BackendService } from 'src/app/services/backend.service';
 import { ActivatedRoute } from '@angular/router';
+import { ItemReorderEventDetail } from '@ionic/core';
 
 @Component({
   selector: 'app-item',
@@ -34,6 +35,12 @@ export class ItemPage implements OnInit {
   public filtersClass :any = {};
   public links :string = '';
   public searchText = '';
+  public panelClass = 'ion-hide';
+  public panelType = '';
+  public itemsPerPage = '25';
+  public currentPage = 1;
+  public totalPages = 1;
+  private propertiesOrder :any = [];
 
   constructor(
     private backend: BackendService,
@@ -63,32 +70,33 @@ export class ItemPage implements OnInit {
                 this.filtersClass[prop.id] = 'hideContent';
               }
             }
+            this.propertiesOrder.push(prop.id);
           }
           this.properties = res['properties'];
         });
-        this.getItems([]);
+        this.getItems([{key: 'per_page', value: this.itemsPerPage}]);
       }
     });
+  }
+
+  public reloadItems() {
+    this.getItems([{key: 'per_page', value: this.itemsPerPage}]);
   }
 
   private async getItems(params :object[]) {
     let res = await this.backend.getItems(this.typeId, params);
     if (res !== undefined) {
-      let numberElements = res.headers.get('X-Total-Count');
-      if (numberElements !== null) {
-        this.numberElements = numberElements;
-      }
-      let links = res.headers.get('Link');
-      if (links !== null) {
-        this.links = links;
-      }
-      this.items = res.body;
-      this.items.sort((a :any, b :any) => (a.name > b.name) ? 1 : -1);
+      this.parseGetItemsResponse(res);
     }
   }
 
   public getListProperties() {
     return <any>this.properties.filter((prop :any) => prop.valuetype === "list");
+  }
+
+  public getItemPropertiesOrder(properties: Array<any>) {
+    properties.sort((a, b) => this.propertiesOrder.indexOf(a.id) - this.propertiesOrder.indexOf(b.id));
+    return properties;
   }
 
   public reverseFilterClass(propId :number) {
@@ -103,16 +111,7 @@ export class ItemPage implements OnInit {
     this.backend.getPagination(type, this.links)
       ?.subscribe((res) => {
       if (res !== null) {
-        let numberElements = res.headers.get('X-Total-Count');
-        if (numberElements !== null) {
-          this.numberElements = numberElements;
-        }
-        let links = res.headers.get('Link');
-        if (links !== null) {
-          this.links = links;
-        }
-        this.items = res.body;
-        this.items.sort((a :any, b :any) => (a.name > b.name) ? 1 : -1);
+        this.parseGetItemsResponse(res);
       }
     })
   }
@@ -137,4 +136,66 @@ export class ItemPage implements OnInit {
     await this.getItems(params);
   }
 
+  /**
+   * This function is used to display a type of panel, or hide it
+   *
+   * @param type
+   */
+  public setPanelType(type: string) {
+    if (this.panelType === '') {
+      this.panelType = type;
+      this.panelClass = '';
+    } else if (this.panelType !== type) {
+      this.panelType = type;
+    } else {
+      this.panelType = '';
+      this.panelClass = 'ion-hide';
+    }
+  }
+
+  public exportItems(fileFormat: string) {
+    console.log(fileFormat);
+  }
+
+  public doReorder(ev: CustomEvent<ItemReorderEventDetail>) {
+    // console.log('Dragged from index', ev.detail.from, 'to', ev.detail.to);
+    this.properties = ev.detail.complete(this.properties);
+    let propertiesOrder :any = [];
+    for (let prop of this.properties) {
+      propertiesOrder.push(prop.id);
+    }
+    this.propertiesOrder = propertiesOrder;
+    this.items = [...this.items];
+  }
+
+  public navClass(page :string) {
+    if (this.currentPage === 1 && page === 'first') {
+      return 'navcurrent';
+    }
+    if (this.currentPage === this.totalPages && page === 'last') {
+      return 'navcurrent';
+    }
+    return 'nav';
+  }
+
+  private parseGetItemsResponse(res: any)
+  {
+    let numberElements = res.headers.get('X-Total-Count');
+    if (numberElements !== null) {
+      this.numberElements = numberElements;
+    }
+    this.totalPages = Math.ceil(parseInt(this.numberElements) / parseInt(this.itemsPerPage));
+    // Manage links
+    let links = res.headers.get('Link');
+    if (links !== null) {
+      this.links = links;
+    }
+    // Manage Content-Range
+    let contentRange = res.headers.get('Content-Range');
+    const matches = contentRange.match(/items (\d+)-(\d+)\/(\d+)/);
+    this.currentPage = Math.ceil(matches[1] / parseInt(this.itemsPerPage));
+
+    this.items = res.body;
+    this.items.sort((a :any, b :any) => (a.name > b.name) ? 1 : -1);
+  }
 }

@@ -1,4 +1,4 @@
-/**
+/*
  * FusionSuite - Frontend
  * Copyright (C) 2022 FusionSuite
  *
@@ -13,31 +13,32 @@
  * GNU Affero General Public License for more details.
  * 
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 ion-menu{
-  --width: 270px;
+  --width: 180;
 }
 
 ion-content {
-  --background: #f1f3f6;
+  --background: #0478a7;
 }
 
 ion-toolbar {
-  --background: #f1f3f6;
+  --background: #0478a7;
 }
 
 ion-list {
-  --background: #f1f3f6;
+  --background: #0478a7;
 }
 
 .list-md {
-  background: #f1f3f6;
+  background: #0478a7;
 }
 
 ion-item {
-  --background: #f1f3f6;
-  --color: #9d9fad;
+  --background: #0478a7;
+  --color: #fff;
+  --min-height: 16px;
+  font-size: 14px;
 }
 
 ion-label {
