@@ -63,7 +63,7 @@ export class BackendService {
       params: new HttpParams(),
     };
 
-    return await this.http.get(this.settingsService.url + '/v1/cmdb/types', httpOptions)
+    return await this.http.get(this.settingsService.url + '/v1/config/types', httpOptions)
       .pipe(map(res => {
         for (const type of Object.values(res)) {
           this.globalVars.types.push(type);
@@ -85,7 +85,7 @@ export class BackendService {
       params: new HttpParams(),
     };
 
-    return this.http.get(this.settingsService.url + '/v1/cmdb/typeproperties', httpOptions);
+    return this.http.get(this.settingsService.url + '/v1/config/typeproperties', httpOptions);
   }
 
   public getType(id: number) {
@@ -100,7 +100,7 @@ export class BackendService {
       params: new HttpParams(),
     };
 
-    return this.http.get(this.settingsService.url + '/v1/cmdb/types/' + id, httpOptions);
+    return this.http.get(this.settingsService.url + '/v1/config/types/' + id, httpOptions);
   }
 
   /**
@@ -120,18 +120,18 @@ export class BackendService {
       }),
       params: new HttpParams(),
     };
-    let ret :any = await this.http.post(this.settingsService.url + '/v1/cmdb/types', {name}, httpOptions).toPromise();
+    let ret :any = await this.http.post(this.settingsService.url + '/v1/config/types', {name}, httpOptions).toPromise();
     if (ret['id']) {
       console.log(groups);
       let position = 1;
       for (let group of groups) {
         let propertiesOfGroup = [];
         for (let propertyId of group.properties) {
-          await this.http.post(this.settingsService.url + '/v1/cmdb/types/' + ret['id'] + '/property/' + propertyId, {}, httpOptions).toPromise();
+          await this.http.post(this.settingsService.url + '/v1/config/types/' + ret['id'] + '/property/' + propertyId, {}, httpOptions).toPromise();
           propertiesOfGroup.push(propertyId);
         }
         // TODO create group
-        await this.http.post(this.settingsService.url + '/v1/cmdb/types/' + ret['id'] + '/propertygroups', {name: group.name, properties: propertiesOfGroup, position}, httpOptions).toPromise();
+        await this.http.post(this.settingsService.url + '/v1/config/types/' + ret['id'] + '/propertygroups', {name: group.name, properties: propertiesOfGroup, position}, httpOptions).toPromise();
         position += 1;
       }
     }
@@ -150,7 +150,7 @@ export class BackendService {
       }),
       params: new HttpParams(),
     };
-    return this.http.post(this.settingsService.url + '/v1/cmdb/typeproperties', data, httpOptions);
+    return this.http.post(this.settingsService.url + '/v1/config/typeproperties', data, httpOptions);
   }
 
   public async createItem(typeId :number, data :any) {
@@ -164,7 +164,7 @@ export class BackendService {
       }),
       params: new HttpParams(),
     };
-    let ret :any = await this.http.post(this.settingsService.url + '/v1/cmdb/types/' + typeId + '/items', data, httpOptions).toPromise();
+    let ret :any = await this.http.post(this.settingsService.url + '/v1/config/types/' + typeId + '/items', data, httpOptions).toPromise();
     return ret['id'];
   }
 
@@ -183,7 +183,7 @@ export class BackendService {
     for (let param of params) {
       httpOptions.params = httpOptions.params.set(param['key'], param['value'])
     }
-    return await this.http.get(this.settingsService.url + '/v1/cmdb/types/' + typeId + '/items', httpOptions).toPromise();
+    return await this.http.get(this.settingsService.url + '/v1/items/type/' + typeId, httpOptions).toPromise();
   }
 
   public getItem(id :number) {
@@ -198,7 +198,7 @@ export class BackendService {
       params: new HttpParams(),
     };
 
-    return this.http.get(this.settingsService.url + '/v1/cmdb/items/' + id, httpOptions);
+    return this.http.get(this.settingsService.url + '/v1/items/' + id, httpOptions);
   }
 
   /**

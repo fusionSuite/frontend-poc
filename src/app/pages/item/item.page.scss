@@ -1,4 +1,4 @@
-/**
+/*
  * FusionSuite - Frontend
  * Copyright (C) 2022 FusionSuite
  *
@@ -13,16 +13,21 @@
  * GNU Affero General Public License for more details.
  * 
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-.filters {
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+
+ .filters {
   color: #8c8c8c;
   --border-color: #8c8c8c;
 }
 
 ion-searchbar {
-  --border-radius: 25px;
+  --border-radius: 5px;
+  --box-shadow: none;
+  --icon-color: #68d3ff;
+  max-width: 800px;
+  margin-left: auto;
 }
+
 ion-toolbar {
   height: 95px;
 }
@@ -39,4 +44,140 @@ ion-toolbar {
 ion-chip {
   width: 80%;
   left: 10px;
+}
+
+ion-item-group {
+  border: solid 2px #0478a7 !important;
+  border-radius: 6px;
+}
+
+ion-checkbox {
+  --border-color: #c4c4c4;  
+  --border-width: 1px;
+  margin-right: 20px;
+}
+
+ion-list-header {
+  --color: #0478a7;
+}
+
+ion-item {
+  margin-top: 2px;
+  margin-bottom: 2px;
+  font-size: 14px;
+  color: #6c6c6c;
+  --background-hover: transparent;
+  --color-hover: #0478a7;
+}
+
+ion-item:nth-of-type(odd).listitems {
+  background-color: #fafafa;
+}
+
+ion-list {
+  --ion-background-color: transparent;
+  --ion-border-color: transparent;  
+}
+
+ion-card {
+  margin-inline: 36px;
+  border-radius: 10px;
+  box-shadow: none;
+}
+
+ion-content {
+  --background: #f6f6f6;
+}
+
+.row-header {
+  border-bottom: solid 1px #d9d9d9;  
+}
+
+ion-button {
+  --color: #d9d9d9;
+  --background: transparent;
+  --background-hover: transparent;
+  --padding-start: 5px;
+  --padding-end: 5px;
+}
+
+ion-toolbar {
+  --border-width: 0px;
+  --background: #f6f6f6;
+}
+
+.header-md::after {
+  background-image: none;
+}
+
+.nav {
+  --background: #f5f5f5;
+  --color: #0478a7;
+  --border-radius: 3px;
+  --box-shadow: none;
+  width: 32px;
+  height: 26px;
+}
+
+.navcurrent {
+  --background: #0478a7;
+  --color: #fff;
+  --border-radius: 3px;
+  --box-shadow: none;
+  width: 32px;
+  height: 26px;
+}
+
+ion-card.panel {
+  background-color: #f5f5f5;
+  margin-right: -10px;
+  margin-left: 0px;
+  margin-top: 60px;
+  border-top-right-radius: 0px;
+  border-bottom-right-radius: 0px;
+  height: calc(100% - 130px);
+}
+
+ion-card.panel ion-card-header ion-card-title {
+  --color: #0478a7;
+  font-size: 14px;
+}
+
+ion-card.panel ion-card-content {
+  margin-bottom: 60px;
+  font-size: 14px;
+}
+
+ion-item-group {
+  min-height: 350px;
+}
+
+ion-chip {
+  width: 100%;
+  left: 0px;  
+}
+
+ion-chip.activated {
+  --background: #68d3ff;
+  --color: #fff;
+}
+
+.item-chip {
+  --background: transparent;
+  --padding-start: 0px;
+  --inner-padding-end: 0px;  
+}
+
+ion-reorder {
+  margin-inline-start: 0px;
+}
+
+.accordion-header {
+  --background: #0478a7;
+  --color: #fff;
+  --border-radius: 5px;
+}
+.accordion-header > ion-label {
+  --color: #fff;
+  font-weight: 600;  
 }

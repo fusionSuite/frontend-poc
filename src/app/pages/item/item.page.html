@@ -17,27 +17,17 @@
 -->
 <ion-header>
   <ion-toolbar>
-    <ion-grid>
+    <ion-grid style="padding-left: 12px;">
       <ion-row>
         <ion-col size="2">
-          <ion-title>{{name}}</ion-title>
-          <p *ngIf="numberElements != ''" style="padding-inline-start: 20px;">
-            <fa-icon [icon]="['fas', 'quote-left']" size="lg"></fa-icon>
+          <ion-title class="page-title">{{name}}</ion-title>
+          <p *ngIf="numberElements != ''" style="padding-inline-start: 20px; color: #0478a7;font-size: 10px;">
+            <fa-icon [icon]="['fas', 'quote-left']" size="xs" transform="up-8"></fa-icon>
             {{numberElements}} elements
           </p>
         </ion-col>
-        <ion-col size="8">
+        <ion-col size="10">
           <ion-searchbar [(ngModel)]="searchText" debounce="500" (keyup.enter)="search($event)"></ion-searchbar>
-        </ion-col>
-        <ion-col size="2">
-          <ion-item lines="none">
-            <ion-avatar slot="start">
-              <img src="https://en.gravatar.com/userimage/13475082/fe1be3db6ddb66650678ce314497836b.jpg?d=identicon&f=y">
-            </ion-avatar>
-            <ion-label>
-              <ion-label>David Durieux</ion-label>
-            </ion-label>
-          </ion-item>
         </ion-col>
       </ion-row>
     </ion-grid>
@@ -45,17 +35,42 @@
 </ion-header>
 
 <ion-content>
-  <ion-fab vertical="top" horizontal="end" edge slot="fixed">
+  <!-- <ion-fab vertical="top" horizontal="end" edge slot="fixed">
     <ion-fab-button [routerLink]="['detail/0']">
       <ion-icon name="add"></ion-icon>
     </ion-fab-button>
-  </ion-fab>
+  </ion-fab> -->
 
-  <ion-grid>
-    <ion-row>
-      <ion-col size="2">
+  <ion-card>
+    <ion-card-header style="padding-bottom: 0px;">
+      <ion-grid>
+        <ion-row class="row-header">
+          <ion-col>
+            <ion-button fill="clear" (click)="setPanelType('filters')">
+              <fa-icon [icon]="['fas', 'filter']" size="lg"></fa-icon>
+            </ion-button>
+            <ion-button fill="clear" (click)="setPanelType('bookmark')">
+              <fa-icon [icon]="['fas', 'bookmark']" size="lg"></fa-icon>
+            </ion-button>
+            <ion-button fill="clear" (click)="setPanelType('savebookmark')">
+              <fa-icon [icon]="['fas', 'save']" size="lg"></fa-icon>
+            </ion-button>
+            <ion-button fill="clear" (click)="setPanelType('parameters')">
+              <fa-icon [icon]="['fas', 'cogs']" size="lg"></fa-icon>
+            </ion-button>
+            <ion-button fill="clear" (click)="setPanelType('export')">
+              <fa-icon [icon]="['fas', 'file-export']" size="lg"></fa-icon>
+            </ion-button>
+          </ion-col>
+          <ion-col>
+            <ng-container *ngTemplateOutlet="navigationPagination"></ng-container>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-card-header>
+    <ion-card-content>
         <!-- Manage the properties are type: list -->
-        <div *ngFor="let prop of getListProperties()">
+        <!-- <div *ngFor="let prop of getListProperties()">
           <ion-list [class]="filtersClass[prop.id]">
             <ion-item lines="none">
               <ion-label style="font-weight: bold;" class="filters">{{prop.name}}</ion-label>
@@ -75,89 +90,164 @@
               Show less
             </ion-label>
           </ion-chip>          
-        </div>
-      </ion-col>
-      <ion-col size="10">
-        <ion-grid>
-          <ion-row>
-            <ion-col>
-              <ion-grid>
-                <ion-row>
-                  <ion-col>
-                    <ion-button fill="clear" color="medium">
-                      <fa-icon [icon]="['fas', 'filter']" size="lg"></fa-icon>
-                    </ion-button>
-                    <ion-button fill="clear" color="medium">
-                      <fa-icon [icon]="['fas', 'bookmark']" size="lg"></fa-icon>
-                    </ion-button>
-                    <ion-button fill="clear" color="medium">
-                      <fa-icon [icon]="['fas', 'bell']" size="lg"></fa-icon>
-                    </ion-button>
-                    <ion-button fill="clear" color="medium">
-                      <fa-icon [icon]="['fas', 'trash-alt']" size="lg"></fa-icon>
-                    </ion-button>
-                  </ion-col>
-                  <ion-col>
-                    <ion-item lines="none">
-                      <ion-label>Sort by</ion-label>
-                      <ion-select placeholder="Select One" value="name">
-                        <ion-select-option value="name">Name</ion-select-option>
-                        <ion-select-option *ngFor="let prop of properties" value="{{prop.id}}">{{prop.name}}</ion-select-option>
-                      </ion-select>            
-                    </ion-item>
-                  </ion-col>
-                  <ion-col>
-                    <ion-item lines="none" button="false">
-                      <ion-button style="z-index: 3;" fill="clear" color="medium" [disabled]="!links.includes('rel=&quot;first&quot;')" (click)="loadLink('first')">
-                        <fa-icon [icon]="['fas', 'backward']" size="lg"></fa-icon>
-                      </ion-button>
-                      <ion-button style="z-index: 3;" fill="clear" color="medium" [disabled]="!links.includes('rel=&quot;prev&quot;')" (click)="loadLink('prev')">
-                        <fa-icon [icon]="['fas', 'play']" flip="horizontal" size="lg"></fa-icon>
-                      </ion-button>
-                      <ion-select interface="popover" value="100" style="width: 60px;">
-                        <ion-select-option value="10">10</ion-select-option>
-                        <ion-select-option value="50">50</ion-select-option>
-                        <ion-select-option value="100">100</ion-select-option>
-                        <ion-select-option value="200">200</ion-select-option>
-                        <ion-select-option value="500">500</ion-select-option>
-                        <ion-select-option value="990">990</ion-select-option>
-                      </ion-select>
-                      <ion-button style="z-index: 2;" fill="clear" color="medium" [disabled]="!links.includes('rel=&quot;next&quot;')" (click)="loadLink('next')">
-                        <fa-icon [icon]="['fas', 'play']" size="lg"></fa-icon>
-                      </ion-button>
-                      <ion-button style="z-index: 2;" fill="clear" color="medium" [disabled]="!links.includes('rel=&quot;last&quot;')" (click)="loadLink('last')">
-                        <fa-icon [icon]="['fas', 'forward']" size="lg"></fa-icon>
-                      </ion-button>
-                    </ion-item>
-                  </ion-col>
-                  <ion-col>
-                    <ion-button fill="outline" color="medium">
-                      <fa-icon [icon]="['fas', 'list']" size="lg"></fa-icon>
-                    </ion-button>
-                    <ion-button fill="clear" color="medium">
-                      <fa-icon [icon]="['fas', 'th-large']" size="lg"></fa-icon>
-                    </ion-button>
-                  </ion-col>
-                </ion-row>
-              </ion-grid>
-            </ion-col>
-          </ion-row>
-        </ion-grid>
+        </div> -->
 
-        <ion-list>
-          <ion-item>
-            <ion-checkbox></ion-checkbox>
-            <ion-label style="font-weight: bold;">Name</ion-label>
-            <ion-label style="font-weight: bold;" *ngFor="let prop of properties">{{prop.name}}</ion-label>
-          </ion-item>
-          <ion-item *ngFor="let item of items" [routerLink]="['view/' + item.id]">
-            <ion-checkbox></ion-checkbox>
-            <ion-label>{{item.name}}</ion-label>
-            <ion-label *ngFor="let prop of item.properties">{{prop.value}}</ion-label>
-          </ion-item>
-        </ion-list>
-      </ion-col>
-    </ion-row>
-  </ion-grid>
+      <ion-grid>
+        <ion-row>
+          <ion-col size="2" [class]="panelClass">
+            <!-- export -->
+            <ion-card *ngIf="panelType === 'export'" class="panel">
+              <ion-card-header>
+                <ion-card-title>Export</ion-card-title>
+              </ion-card-header>
+              <ion-card-content>
+                <ion-list>
+                  <ion-item lines="none" button (click)="exportItems('csv')">
+                    <fa-icon [icon]="['fas', 'file-csv']" size="lg" style="margin-right: 5px;"></fa-icon>
+                    <ion-label>Export in CSV</ion-label>
+                  </ion-item>
+                  <ion-item lines="none" button (click)="exportItems('pdf')">
+                    <fa-icon [icon]="['fas', 'file-pdf']" size="lg" style="margin-right: 5px;"></fa-icon>
+                    <ion-label>Export in PDF</ion-label>
+                  </ion-item>
+                </ion-list>
+              </ion-card-content>
+            </ion-card>
+
+            <!-- bookmark -->
+            <ion-card *ngIf="panelType === 'bookmark'" class="panel">
+              <ion-card-header>
+                <ion-card-title>Bookmarks</ion-card-title>
+              </ion-card-header>
+              <ion-card-content>
+              </ion-card-content>
+            </ion-card>
+
+            <!-- savebookmark -->
+            <ion-card *ngIf="panelType === 'savebookmark'" class="panel">
+              <ion-card-header>
+                <ion-card-title>Save</ion-card-title>
+              </ion-card-header>
+              <ion-card-content>
+              </ion-card-content>
+            </ion-card>
+
+            <!-- filters -->
+            <ion-card *ngIf="panelType === 'filters'" class="panel">
+              <ion-card-header>
+                <ion-card-title>Filters</ion-card-title>
+              </ion-card-header>
+              <ion-card-content>
+                <ion-accordion-group *ngFor="let prop of getListProperties()">
+                  <ion-accordion value="colors">
+                    <ion-item slot="header" class="accordion-header">
+                      <ion-label>{{prop.name}}</ion-label>
+                      <fa-icon [icon]="['fas', 'caret-down']" size="2x" class="ion-accordion-toggle-icon" style="color: #fff;"></fa-icon>
+                    </ion-item>
+                
+                    <ion-list slot="content">
+                      <ion-item *ngFor="let listItem of prop.listvalues" button>
+                        <ion-label>{{listItem.value}}</ion-label>
+                      </ion-item>
+                    </ion-list>
+                  </ion-accordion>
+                </ion-accordion-group>                
+              </ion-card-content>
+            </ion-card>
+
+            <!-- parameters -->
+            <ion-card *ngIf="panelType === 'parameters'" class="panel">
+              <ion-card-header>
+                <ion-card-title>Parameters</ion-card-title>
+              </ion-card-header>
+              <ion-card-content>
+                <ion-reorder-group disabled="false" (ionItemReorder)="doReorder($any($event))">
+                  <ion-item *ngFor="let prop of properties" lines="none" class="item-chip">
+                    <ion-chip class="activated">
+                      <ion-label>{{prop.name}}</ion-label>
+                    </ion-chip>
+                    <ion-reorder slot="end"></ion-reorder>
+                  </ion-item>
+                </ion-reorder-group>
+              </ion-card-content>
+            </ion-card>
+
+            <!-- actions -->
+            <ion-card *ngIf="panelType === 'actions'" class="panel">
+              <ion-card-header>
+                <ion-card-title>Actions</ion-card-title>
+              </ion-card-header>
+              <ion-card-content>
+              </ion-card-content>
+            </ion-card>
+          </ion-col>
+          <ion-col>
+            <ion-list>
+              <ion-list-header>
+                <ion-checkbox></ion-checkbox>
+                <ion-label>Name</ion-label>
+                <ion-label *ngFor="let prop of properties">{{prop.name}}</ion-label>
+              </ion-list-header>
+              <ion-item-group>
+                <ion-note *ngIf="items.length === 0">No items</ion-note>
+                <ion-item *ngFor="let item of items" [routerLink]="['view/' + item.id]" class="listitems">
+                  <ion-checkbox></ion-checkbox>
+                  <ion-label>{{item.name}}</ion-label>
+                  <ion-label *ngFor="let prop of getItemPropertiesOrder(item.properties)">{{prop.value}}</ion-label>
+                </ion-item>
+              </ion-item-group>
+            </ion-list>
+            <ng-container *ngTemplateOutlet="navigationPagination"></ng-container>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-card-content>
+  </ion-card>
+  <ng-template #navigationPagination>
+    <ion-item lines="none" button="false">
+      <span slot="end" >
+      <ion-button class="nav" [disabled]="!links.includes('rel=&quot;first&quot;')" (click)="loadLink('first')">
+        <fa-icon [icon]="['fas', 'angles-left']" size="lg"></fa-icon>
+      </ion-button>
+      <ion-button class="nav" [disabled]="!links.includes('rel=&quot;prev&quot;')" (click)="loadLink('prev')">
+        <fa-icon [icon]="['fas', 'angle-left']" size="lg"></fa-icon>
+      </ion-button>
+      <ion-button [ngClass]="navClass('first')" (click)="loadLink('first')">
+        1
+      </ion-button>
+      <ion-button class="nav" [disabled]="true" *ngIf="currentPage > 2">
+        ...
+      </ion-button>
+      <ion-button class="navcurrent" *ngIf="(currentPage > 1) && (currentPage < (totalPages))">
+        {{currentPage}}
+      </ion-button>
+      <ion-button class="nav" [disabled]="true" *ngIf="currentPage < (totalPages - 1)">
+        ...
+      </ion-button>
+      <ion-button  [ngClass]="navClass('last')" *ngIf="totalPages > 1" (click)="loadLink('last')">
+        {{totalPages}}
+      </ion-button>
+      <ion-button class="nav" [disabled]="!links.includes('rel=&quot;next&quot;')" (click)="loadLink('next')">
+        <fa-icon [icon]="['fas', 'angle-right']" size="lg"></fa-icon>
+      </ion-button>
+      <ion-button class="nav" [disabled]="!links.includes('rel=&quot;last&quot;')" (click)="loadLink('last')">
+        <fa-icon [icon]="['fas', 'angles-right']" size="lg"></fa-icon>
+      </ion-button>
+    </span>
+      <ion-label slot="end" position="fixed" style="-webkit-flex: 0 0 200px;" class="ion-text-end" style="-webkit-flex: none;-ms-flex: none;flex: none;width: unset !important;min-width: none;max-width: none;">
+        Results per page: 
+      </ion-label>
+      <ion-select slot="end" interface="popover" [(ngModel)]="itemsPerPage" [value]="itemsPerPage" (ionChange)="reloadItems()" style="width: 60px;">
+        <ion-select-option value="5">5</ion-select-option>
+        <ion-select-option value="10">10</ion-select-option>
+        <ion-select-option value="25">25</ion-select-option>
+        <ion-select-option value="50">50</ion-select-option>
+        <ion-select-option value="100">100</ion-select-option>
+        <ion-select-option value="200">200</ion-select-option>
+        <ion-select-option value="500">500</ion-select-option>
+        <ion-select-option value="990">990</ion-select-option>
+      </ion-select>
+    </ion-item>
+  </ng-template>
 
 </ion-content>
