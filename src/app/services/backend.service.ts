@@ -21,6 +21,9 @@ import { GlobalVarsService } from './global-vars.service';
 import {catchError, map} from 'rxjs/operators';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { SettingsService } from './settings.service';
+import { IItem } from 'src/app/interfaces/Item';
+import { IType } from 'src/app/interfaces/Type';
+import { IItemCreate } from 'src/app/interfaces/ItemCreate';
 
 @Injectable({
   providedIn: 'root'
@@ -88,7 +91,7 @@ export class BackendService {
     return this.http.get(this.settingsService.url + '/v1/config/typeproperties', httpOptions);
   }
 
-  public getType(id: number) {
+  public getType(id: number): Observable<IType> {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
@@ -100,7 +103,7 @@ export class BackendService {
       params: new HttpParams(),
     };
 
-    return this.http.get(this.settingsService.url + '/v1/config/types/' + id, httpOptions);
+    return this.http.get<IType>(this.settingsService.url + '/v1/config/types/' + id, httpOptions);
   }
 
   /**
@@ -153,7 +156,7 @@ export class BackendService {
     return this.http.post(this.settingsService.url + '/v1/config/typeproperties', data, httpOptions);
   }
 
-  public async createItem(typeId :number, data :any) {
+  public async createItem(typeId :number, data :IItemCreate) {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
@@ -164,7 +167,7 @@ export class BackendService {
       }),
       params: new HttpParams(),
     };
-    let ret :any = await this.http.post(this.settingsService.url + '/v1/config/types/' + typeId + '/items', data, httpOptions).toPromise();
+    let ret :any = await this.http.post(this.settingsService.url + '/v1/items', data, httpOptions).toPromise();
     return ret['id'];
   }
 
@@ -186,7 +189,7 @@ export class BackendService {
     return await this.http.get(this.settingsService.url + '/v1/items/type/' + typeId, httpOptions).toPromise();
   }
 
-  public getItem(id :number) {
+  public getItem(id :number): Observable<IItem> {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
@@ -198,8 +201,37 @@ export class BackendService {
       params: new HttpParams(),
     };
 
-    return this.http.get(this.settingsService.url + '/v1/items/' + id, httpOptions);
+    return this.http.get<IItem>(this.settingsService.url + '/v1/items/' + id, httpOptions);
   }
+
+  public patchItem(id: number, name: string) {
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        'Cache-Control':  'no-cache, no-store, must-revalidate, post-check=0, pre-check=0',
+        'Pragma': 'no-cache',
+        'Expires': '0',
+        'Authorization': 'Bearer ' + this.token
+      }),
+      params: new HttpParams(),
+    };
+    return this.http.patch(this.settingsService.url + '/v1/items/' + id, {name}, httpOptions);
+  }
+
+  public patchItemProperty(id: number, propId: number, value: string) {
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        'Cache-Control':  'no-cache, no-store, must-revalidate, post-check=0, pre-check=0',
+        'Pragma': 'no-cache',
+        'Expires': '0',
+        'Authorization': 'Bearer ' + this.token
+      }),
+      params: new HttpParams(),
+    };
+    return this.http.patch(this.settingsService.url + '/v1/items/' + id + '/property/' + propId, {value}, httpOptions);
+  }
+
 
   /**
    * 

@@ -20,6 +20,9 @@ ion-menu{
 
 ion-content {
   --background: #0478a7;
+  --offset-bottom: auto !important;
+  overflow: unset;
+  background: #0478a7;
 }
 
 ion-toolbar {

@@ -17,8 +17,11 @@
  */
 import { Component, OnInit } from '@angular/core';
 import { BackendService } from 'src/app/services/backend.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { ItemReorderEventDetail } from '@ionic/core';
+import { IProperty } from 'src/app/interfaces/Property';
+import { IListvalue } from 'src/app/interfaces/Listvalue';
+import { filter } from 'rxjs';
 
 @Component({
   selector: 'app-item',
@@ -45,6 +48,7 @@ export class ItemPage implements OnInit {
   constructor(
     private backend: BackendService,
     private route: ActivatedRoute,
+    private router: Router,
     ) {
 
   }
@@ -60,6 +64,7 @@ export class ItemPage implements OnInit {
         if (name !== null) {
           this.name = name;
         }
+
         this.backend.getType(this.typeId)
         .subscribe((res: any) => {
           this.name = res['name'];
@@ -75,6 +80,12 @@ export class ItemPage implements OnInit {
           this.properties = res['properties'];
         });
         this.getItems([{key: 'per_page', value: this.itemsPerPage}]);
+
+        this.router.events
+        .pipe(filter(event => event instanceof NavigationEnd))
+        .subscribe(res => {
+          this.getItems([{key: 'per_page', value: this.itemsPerPage}]);
+        });        
       }
     });
   }
@@ -176,6 +187,21 @@ export class ItemPage implements OnInit {
       return 'navcurrent';
     }
     return 'nav';
+  }
+
+  public displayPropertyValue(prop: IProperty): string {
+    if (prop.valuetype === 'string') {
+      return prop.value;
+    } else if (prop.valuetype === 'list') {
+      if (prop.value === '') {
+        return '';
+      }
+      let val: IListvalue|undefined = prop.listvalues.find((listValue :IListvalue) => listValue.id === parseInt(prop.value));
+      if (val !== undefined) {
+        return val.value;
+      }
+    }
+    return '';
   }
 
   private parseGetItemsResponse(res: any)

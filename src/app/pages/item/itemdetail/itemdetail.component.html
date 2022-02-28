@@ -15,67 +15,115 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
-<ion-header>
-  <ion-toolbar>
-    <ion-title *ngIf="id === 0">
-      <ion-icon name="flask-outline"></ion-icon>
-      Item creation
-    </ion-title>
-    <ion-title *ngIf="id > 0">
-      <ion-icon name="create-outline"></ion-icon>
-      {{name}}
-    </ion-title>
-  </ion-toolbar>
-</ion-header>
 
-<ion-content>
-  <form [formGroup]="checkoutForm" (ngSubmit)="onSubmit()" *ngIf="formLoaded">
-    <ion-card>
-      <ion-card-content>
-        <ion-item>
-          <ion-label position="stacked">Name</ion-label>
-          <ion-input placeholder="Please set the name here" type="text" formControlName="name"></ion-input>
-        </ion-item>
-      </ion-card-content>
-    </ion-card>
+<ion-split-pane contentId="item">
+  <ion-menu contentId="item">
+    <ion-list style="background: none;">
+      <ion-list-header lines="inset" style="color: #fff;">
+        <ion-label>Navigator</ion-label>
+      </ion-list-header>
+      <ion-item lines="none" class="navigator-item" *ngFor="let propGroup of type.propertygroups">{{propGroup.name}}</ion-item>
+    </ion-list>
+  </ion-menu>
 
-    <ion-card>
-      <div *ngFor="let group of type.propertygroups">
-      <ion-card-header>
-        <ion-card-title>{{group.name}}</ion-card-title>
-      </ion-card-header>
-      <ion-card-content>
-        <ion-grid *ngIf="formLoaded">
+  <ion-content>
+    <ion-header>
+      <ion-toolbar>
+        <ion-grid style="padding-left: 5px;padding-top: 35px;">
           <ion-row>
-            <ion-col [size]="properties[propertyId].valuetype === 'text' ? 12 : 4" *ngFor="let propertyId of group.properties">
-              <ion-item *ngIf="properties[propertyId].valuetype === 'text'" lines="none">
-                <ion-label position="stacked">{{properties[propertyId].name}}</ion-label>
-              </ion-item>
-              <ion-item *ngIf="properties[propertyId].valuetype === 'text'">
-                <quill-editor placeholder="Please set the {{properties[propertyId].name}} here" [formControlName]="properties[propertyId].id"></quill-editor>
-              </ion-item>
-              <ion-item  *ngIf="properties[propertyId].valuetype !== 'text'">
-                <ion-label position="stacked">{{properties[propertyId].name}}</ion-label>
-                <ion-select interface="popover" [formControlName]="properties[propertyId].id" *ngIf="properties[propertyId].valuetype === 'list'">
-                  <ion-select-option *ngFor="let value of properties[propertyId].listvalues" [value]="value.id">{{value.value}}</ion-select-option>
-                </ion-select>
-                <ion-input placeholder="Please set the {{properties[propertyId].name}} here" type="text" [formControlName]="properties[propertyId].id" *ngIf="properties[propertyId].valuetype !== 'list'"></ion-input>
-              </ion-item>
+            <ion-col>
+              <ion-title *ngIf="id === 0" class="page-title page-title-item">
+                Item creation - {{type.name}}
+                <fa-icon [icon]="['fas', 'right-to-bracket']" flip="horizontal" size="lg" class="title-button" [routerLink]="['/items/' + type.id + '/' + type.name.replace(' ', '-')]"></fa-icon>
+                <fa-icon [icon]="['fas', 'floppy-disk']" size="lg" class="title-button" *ngIf="formLoaded && canSave" (click)="onSubmit()"></fa-icon>
+              </ion-title>
+              <ion-title *ngIf="id > 0" class="page-title page-title-item">
+                {{item.id}} - {{type.name}} - {{item.name}}
+                <fa-icon [icon]="['fas', 'right-to-bracket']" flip="horizontal" size="lg" class="title-button" [routerLink]="['/items/' + type.id + '/' + type.name.replace(' ', '-')]"></fa-icon>
+                <fa-icon [icon]="['fas', 'floppy-disk']" size="lg" class="title-button" *ngIf="formLoaded && canSave" (click)="onSubmit()"></fa-icon>
+                <fa-icon [icon]="['fas', 'spinner']" [spin]="true" *ngIf="saving"></fa-icon>
+                <ion-chip *ngIf="saved" color="success" style="margin-left: 10px;">
+                  <ion-label>Saved successfully!</ion-label>
+                </ion-chip>
+              </ion-title>
             </ion-col>
           </ion-row>
         </ion-grid>
-      </ion-card-content>
-    </div>
-    </ion-card>
+      </ion-toolbar>
+    </ion-header>
+    
+    <ion-content>
+      <form [formGroup]="checkoutForm" (ngSubmit)="onSubmit()" id="itemForm" *ngIf="formLoaded">
+        <ion-card>
+          <ion-card-content>
+            <ion-item lines="none">
+              <ion-label position="stacked">Name</ion-label>
+              <ion-input placeholder="Please set the name here" type="text" formControlName="name"></ion-input>
+            </ion-item>
+          </ion-card-content>
+        </ion-card>
 
-    <ion-card>
-      <ion-card-content>
-        <ion-button type="submit" *ngIf="id === 0">Create this item</ion-button>
-        <ion-button type="submit" *ngIf="id > 0">Update this item</ion-button>
-      </ion-card-content>
-    </ion-card>
+        <ion-card *ngFor="let propGroup of type.propertygroups">
+          <ion-card-header>
+            <ion-card-title>{{propGroup.name}}</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <ion-grid>
+              <ion-row>
+                <ion-col size="4" *ngFor="let prop of getPropertiesOfPropertygroup(propGroup.properties)">
+                  <ion-item lines="none">
+                    <ion-label position="stacked">{{prop.name}}</ion-label>
+                    <ion-input *ngIf="prop.valuetype ==='string'" placeholder="Define the value here" type="text" [formControlName]="prop.id"></ion-input>
+                    <ion-select *ngIf="prop.valuetype ==='list'" [formControlName]="prop.id" interface="popover" [compareWith]="compareWith">
+                      <ion-select-option *ngFor="let val of prop.listvalues" [value]="val.id">{{val.value}}</ion-select-option>
+                    </ion-select>
+                  </ion-item>
+                </ion-col>
+              </ion-row>
+            </ion-grid>
+          </ion-card-content>
+        </ion-card>
 
-  </form>
 
-</ion-content>
+        <!-- <ion-card>
+          <div *ngFor="let group of type.propertygroups">
+          <ion-card-header>
+            <ion-card-title>{{group.name}}</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <ion-grid *ngIf="formLoaded">
+              <ion-row>
+                <ion-col [size]="properties[propertyId].valuetype === 'text' ? 12 : 4" *ngFor="let propertyId of group.properties">
+                  <ion-item *ngIf="properties[propertyId].valuetype === 'text'" lines="none">
+                    <ion-label position="stacked">{{properties[propertyId].name}}</ion-label>
+                  </ion-item>
+                  <ion-item *ngIf="properties[propertyId].valuetype === 'text'">
+                    <quill-editor placeholder="Please set the {{properties[propertyId].name}} here" [formControlName]="properties[propertyId].id"></quill-editor>
+                  </ion-item>
+                  <ion-item  *ngIf="properties[propertyId].valuetype !== 'text'">
+                    <ion-label position="stacked">{{properties[propertyId].name}}</ion-label>
+                    <ion-select interface="popover" [formControlName]="properties[propertyId].id" *ngIf="properties[propertyId].valuetype === 'list'">
+                      <ion-select-option *ngFor="let value of properties[propertyId].listvalues" [value]="value.id">{{value.value}}</ion-select-option>
+                    </ion-select>
+                    <ion-input placeholder="Please set the {{properties[propertyId].name}} here" type="text" [formControlName]="properties[propertyId].id" *ngIf="properties[propertyId].valuetype !== 'list'"></ion-input>
+                  </ion-item>
+                </ion-col>
+              </ion-row>
+            </ion-grid>
+          </ion-card-content>
+        </div>
+        </ion-card> -->
+    
+        <!-- <ion-card>
+          <ion-card-content>
+            <ion-button type="submit" *ngIf="id === 0">Create this item</ion-button>
+            <ion-button type="submit" *ngIf="id > 0">Update this item</ion-button>
+          </ion-card-content>
+        </ion-card> -->
+    
+      </form>
+    
+    </ion-content>
+  </ion-content>
+</ion-split-pane>  
 

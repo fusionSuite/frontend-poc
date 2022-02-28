@@ -19,14 +19,18 @@
   <ion-toolbar>
     <ion-grid style="padding-left: 12px;">
       <ion-row>
-        <ion-col size="2">
-          <ion-title class="page-title">{{name}}</ion-title>
+        <ion-col size="6">
+          <ion-title class="page-title">
+            {{name}}
+            <fa-icon [routerLink]="['detail/0']" [icon]="['fas', 'plus']" style="color: #0478a7; margin-left: 5px;cursor:pointer;"></fa-icon>
+            <fa-icon [icon]="['fas', 'file-import']" style="color: #0478a7; margin-left: 5px;cursor:pointer;"></fa-icon>
+          </ion-title>
           <p *ngIf="numberElements != ''" style="padding-inline-start: 20px; color: #0478a7;font-size: 10px;">
             <fa-icon [icon]="['fas', 'quote-left']" size="xs" transform="up-8"></fa-icon>
             {{numberElements}} elements
           </p>
         </ion-col>
-        <ion-col size="10">
+        <ion-col size="6">
           <ion-searchbar [(ngModel)]="searchText" debounce="500" (keyup.enter)="search($event)"></ion-searchbar>
         </ion-col>
       </ion-row>
@@ -190,10 +194,10 @@
               </ion-list-header>
               <ion-item-group>
                 <ion-note *ngIf="items.length === 0">No items</ion-note>
-                <ion-item *ngFor="let item of items" [routerLink]="['view/' + item.id]" class="listitems">
+                <ion-item *ngFor="let item of items" [routerLink]="['detail/' + item.id]" class="listitems">
                   <ion-checkbox></ion-checkbox>
                   <ion-label>{{item.name}}</ion-label>
-                  <ion-label *ngFor="let prop of getItemPropertiesOrder(item.properties)">{{prop.value}}</ion-label>
+                  <ion-label *ngFor="let prop of getItemPropertiesOrder(item.properties)">{{displayPropertyValue(prop)}}</ion-label>
                 </ion-item>
               </ion-item-group>
             </ion-list>
