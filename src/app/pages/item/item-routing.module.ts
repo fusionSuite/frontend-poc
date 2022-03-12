@@ -20,6 +20,7 @@ import { Routes, RouterModule } from '@angular/router';
 
 import { ItemPage } from './item.page';
 import { ItemdetailComponent } from './itemdetail/itemdetail.component';
+import { ItemimportComponent } from './itemimport/itemimport.component';
 import { ItemviewComponent } from './itemview/itemview.component';
 
 const routes: Routes = [
@@ -29,6 +30,9 @@ const routes: Routes = [
   },
   {
     path: 'detail/:detailId', component: ItemdetailComponent
+  },
+  {
+    path: 'import', component: ItemimportComponent
   },
   {
     path: 'view/:itemId', component: ItemviewComponent

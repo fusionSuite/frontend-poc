@@ -74,3 +74,34 @@ quill-editor {
 body {
   background-color: #f6f6f6;
 }
+
+.very-big-button {
+  --background: #0478a7;
+  height: 500px;
+  border-radius: 8px;
+  max-width: 400px;
+  ion-card-header {
+    height: 280px;
+    fa-layers {
+      position: unset;
+    }
+  }
+  ion-card-content {
+    color: #fff;
+    text-align: center;
+    height: 200px;
+    ion-label {
+      font-size: 18px;
+      font-weight: 600;
+    }
+    ion-grid {
+      height: 100%;
+      ion-row {
+        min-height: 37px;
+      }
+      fa-icon {
+        color: #68d3ff;
+      }
+    }
+  }
+}

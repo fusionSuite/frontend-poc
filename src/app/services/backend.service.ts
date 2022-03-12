@@ -24,6 +24,7 @@ import { SettingsService } from './settings.service';
 import { IItem } from 'src/app/interfaces/Item';
 import { IType } from 'src/app/interfaces/Type';
 import { IItemCreate } from 'src/app/interfaces/ItemCreate';
+import { IUserparamsIds } from '../interfaces/UserparamsIds';
 
 @Injectable({
   providedIn: 'root'
@@ -71,6 +72,27 @@ export class BackendService {
         for (const type of Object.values(res)) {
           this.globalVars.types.push(type);
         }
+        return res;
+      }))
+      .toPromise();
+  }
+
+  public async getUserparams() {
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        'Cache-Control':  'no-cache, no-store, must-revalidate, post-check=0, pre-check=0',
+        'Pragma': 'no-cache',
+        'Expires': '0',
+        'Authorization': 'Bearer ' + this.token
+      }),
+      params: new HttpParams(),
+    };
+
+    return await this.http.get<IUserparamsIds>(this.settingsService.url + '/v1/userparams', httpOptions)
+      .pipe(map((res) => {
+        console.log(res);
+        this.globalVars.userparams = res;
         return res;
       }))
       .toPromise();
@@ -156,7 +178,7 @@ export class BackendService {
     return this.http.post(this.settingsService.url + '/v1/config/typeproperties', data, httpOptions);
   }
 
-  public async createItem(typeId :number, data :IItemCreate) {
+  public async createItem(data :IItemCreate) {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
@@ -261,6 +283,21 @@ export class BackendService {
       }
     }
     return null;
+  }
+
+  public getMyParams(typeId :number) {
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        'Cache-Control':  'no-cache, no-store, must-revalidate, post-check=0, pre-check=0',
+        'Pragma': 'no-cache',
+        'Expires': '0',
+        'Authorization': 'Bearer ' + this.token
+      }),
+      params: new HttpParams(),
+      observe: 'response' as 'response',
+    };
+    return this.http.get(this.settingsService.url + '/v1/items/type/' + typeId, httpOptions);
   }
 
 }

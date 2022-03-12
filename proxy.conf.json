@@ -1,0 +1,8 @@
+{
+    "/fusionsuite/backend/*": {
+      "target": "http://127.0.0.1/fusionsuite/backend/",
+      "secure": false,
+      "changeOrigin": true,
+      "logLevel": "debug"
+    }
+  }

@@ -19,7 +19,7 @@ import { Component, OnInit } from '@angular/core';
 import { BackendService } from 'src/app/services/backend.service';
 import { ActivatedRoute } from '@angular/router';
 import { FormGroup, FormArray, FormControl, Validators } from '@angular/forms';
-import {forkJoin, of} from 'rxjs';
+import { forkJoin } from 'rxjs';
 import { IItem } from 'src/app/interfaces/Item';
 import { IType } from 'src/app/interfaces/Type';
 import { IProperty } from 'src/app/interfaces/Property';
@@ -141,7 +141,7 @@ export class ItemdetailComponent implements OnInit {
           value: this.checkoutForm.value[property.id]
         });
       }
-      let id = this.backend.createItem(this.typeId, data);
+      let id = this.backend.createItem(data);
       this.saving = false;
       this.saved = true;
     }

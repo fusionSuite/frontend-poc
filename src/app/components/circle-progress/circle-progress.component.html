@@ -1,0 +1,35 @@
+<div [ngStyle]="{
+    'width': '100%',
+    'height': '100%',
+    'display': 'flex',
+    'align-items': 'center',
+    'justifyContent': 'center',
+    'background': 'conic-gradient(#0478a7 ' + progressAmount.toString() + '%, #68d3ff 0 ' + (progressAmount + 5).toString() + '%, #c7eeff 0 ' + (progressAmount + 10).toString() + '%, #ecf0f1 0 100%)',
+    'borderRadius': '50%'}">
+  <div [ngStyle]="{
+    'display': 'flex',
+    'align-items': 'center',
+    'justifyContent': 'center',
+    'background-color': '#fff',
+    'height': '90%',
+    'width': '90%',
+    'borderRadius': '50%'}" *ngIf="progressAmount < 100">
+    <!-- <fa-icon [icon]="['fas', 'cloud-arrow-up']" size="3x" style="color: #68d3ff;"></fa-icon> -->
+    <span [ngStyle]="{'font-size': '36px','color': '#68d3ff'}">
+      {{progressAmount}}%
+    </span>
+  </div>
+  <div [ngStyle]="{
+    'display': 'flex',
+    'align-items': 'center',
+    'justifyContent': 'center',
+    'background-color': '#68d3ff',
+    'height': '90%',
+    'width': '90%',
+    'borderRadius': '50%',
+    'box-shadow': '0px 0px 7px 0px rgba(0, 0, 0, 0.1)'}" *ngIf="progressAmount === 100">
+    <span [ngStyle]="{'font-size': '2em','font-weight': 'lighter'}">
+      <fa-icon [icon]="['fas', 'check']" size="3x" style="color: #fff"></fa-icon>
+    </span>
+  </div>
+</div>

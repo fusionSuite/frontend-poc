@@ -1,0 +1,169 @@
+<!--
+ * FusionSuite - Frontend
+ * Copyright (C) 2022 FusionSuite
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+
+<ion-header>
+  <ion-toolbar>
+    <ion-grid style="padding-left: 12px;">
+      <ion-row>
+        <ion-col>
+          <ion-title class="page-title">
+            Import CSV file
+          </ion-title>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <ion-modal [isOpen]="modalImportStatus" style="--background: transparent; --border-radius: 10px;">
+    <ng-template>
+      <ion-card style="margin-inline: unset; height: 100%;margin-top: 0px;margin-bottom: 0px;">
+        <ion-card-header style="font-size: 24px;">
+          Progress status of data import
+          <fa-icon [icon]="['fas', 'xmark']" size="lg" style="color: #fff;cursor:pointer;position: absolute;right: 20px;" (click)="closeModal()"></fa-icon>
+        </ion-card-header>
+        <ion-card-content style="background-color: #f6f6f6;height: 100%;">
+          <ion-grid>
+            <ion-row style="margin-top: 60px;">
+              <ion-col class="ion-text-center">
+                <div style="display: flex; align-items: center; flex-direction: column">
+                  <div style="width: 170px; height: 170px; margin: 20px;">
+                    <app-circle-progress [progressAmount]="valProgressBar"></app-circle-progress>
+                  </div>
+                </div>
+              </ion-col>
+            </ion-row>
+            <ion-row>
+              <ion-col class="ion-text-center">
+                <ion-label style="color: #68d3ff; font-size: 18px;">
+                  {{numberImported}} / {{(csvRecords.length - 1)}} elements imported
+                </ion-label>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+        </ion-card-content>
+      </ion-card>
+    </ng-template>
+  </ion-modal>
+
+  <ion-grid *ngIf="csvRecords.length === 0">
+    <ion-row>
+      <ion-col size="1"></ion-col>
+      <ion-col size="10">
+        <ion-card class="extra-large-button" appDragdropfile (fileDropped)="onFileDropped($event)">
+          <ion-card-header>
+            <fa-layers>
+              <fa-icon [icon]="['fas', 'circle']" size="10x" style="color: #fff; font-size: 20px;"></fa-icon>
+              <fa-icon [icon]="['fas', 'cloud-arrow-up']" size="5x" style="color: #68d3ff;"></fa-icon>
+            </fa-layers>
+          </ion-card-header>
+          <ion-card-content>
+            <ion-grid>
+              <ion-row>
+                <ion-col>
+                  <ion-label>
+                    Drag and drop file here
+                  </ion-label>
+                </ion-col>
+              </ion-row>
+              <ion-row>
+                <ion-col>
+                  <ion-label>
+                    <div class="form-group">
+                      <label for="file">or<br></label>
+                      <ion-input type="file" id="file" (change)="handleFileInput($event)"></ion-input>
+                    </div>
+                  </ion-label>
+                </ion-col>
+              </ion-row>
+              <ion-row><ion-col></ion-col></ion-row>
+            </ion-grid>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+      <ion-col size="1"></ion-col>
+    </ion-row>
+  </ion-grid>
+
+  <ion-card *ngIf="csvRecords.length > 0">
+    <ion-grid style="margin-left: 32px;margin-right: 32px;">
+      <ion-row style="border-bottom: solid 1px #d9d9d9;">
+        <ion-col>
+          <ion-label position="stacked" style="color: #cecece;font-weight: bold;">Select a selection configuration:</ion-label>
+          <ion-select interface="popover" placeholder="Select a selection configuration" [(ngModel)]="modelSelected" style="border: 2px solid #cecece;border-radius: 5px;margin-top: 10px;">
+            <ion-select-option value="{{item.id}}" *ngFor="let item of modelListSelect">{{item.name}}</ion-select-option>
+          </ion-select>
+        </ion-col>
+        <ion-col>
+          <ion-button (click)="selectModelById()" style="--background: #68d3ff; --color: #fff; --box-shadow: none; width: 100px;margin-top: 26px;height: 43px;font-weight: bold;">Load</ion-button>
+        </ion-col>
+        <ion-col>
+          <ion-label position="stacked" style="color: #cecece;font-weight: bold;">Save the selection:</ion-label>
+          <ion-input [disabled]="hasColsDefined()" [(ngModel)]="modelName" placeholder="Choose a name" style="border: 2px solid #cecece;border-radius: 5px;margin-top: 10px;"></ion-input>
+        </ion-col>
+        <ion-col>
+          <ion-button [disabled]="hasColsDefined()" (click)="saveCSVModel()" style="--background: #68d3ff; --color: #fff; --box-shadow: none; width: 100px;margin-top: 26px;height: 43px;font-weight: bold;">Save</ion-button>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+
+    <ion-card style="overflow-x: scroll;">
+      <ion-grid style="margin-left: -5px; margin-right: -5px; margin-top: -5px;--ion-grid-columns: {{csvRecords[0].length}}; width: 2200px;">
+        <ion-row style="background: #0478a7; color: #fff; background: #0478a7; color: #fff; min-height: 80px; padding-top: 20px;">
+          <ion-col *ngFor="let field of csvRecords[0]; let i = index" style="width: 180px;">
+            {{field}} <ion-checkbox [(ngModel)]="joiningFields[i]"></ion-checkbox>
+          </ion-col>
+        </ion-row>
+        <ion-row style="background-color: #fafafa;">
+          <ion-col *ngFor="let field of csvRecords[0]; let i = index" style="width: 180px;">
+            <ion-select [(ngModel)]="mappingFields[i]" placeholder="Select" class="ion-text-center">
+              <ion-select-option></ion-select-option>
+              <ion-select-option *ngFor="let prop of properties" [value]="prop">{{prop.name}}</ion-select-option>
+            </ion-select>
+          </ion-col>
+        </ion-row>
+        <!-- <ion-row style="background-color: #ededed;">
+          <ion-col *ngFor="let field of csvRecords[0]; let i = index" class="ion-text-center">
+            <ion-checkbox [(ngModel)]="joiningFields[i]"></ion-checkbox>
+          </ion-col>
+        </ion-row> -->
+        <ion-row *ngFor="let line of csvRecords.slice(1, 8)">
+          <ion-col *ngFor="let field of line" style="width: 180px;">
+            {{field}}
+          </ion-col>
+        </ion-row>
+        <ion-row *ngIf="csvRecords.length > 10">
+          <ion-col *ngFor="let field of csvRecords[0]" style="width: 180px;">
+            ...
+          </ion-col>
+        </ion-row>
+        <ion-row *ngIf="importState === 'prepare'">
+          <ion-col style="text-align: center;" size="8">
+            <ion-button [disabled]="hasColsDefined()" style="--background: #0478a7; --color: #fff; --box-shadow: none;" (click)="importCSV()">
+              <fa-icon [icon]="['fas', 'file-arrow-up']" size="lg" style="margin-right: 8px;"></fa-icon>
+              import the data ({{(csvRecords.length - 1)}} rows)
+            </ion-button>
+          </ion-col>
+          <ion-col></ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-card>
+  </ion-card>
+</ion-content>

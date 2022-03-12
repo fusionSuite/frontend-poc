@@ -25,10 +25,13 @@ import { ItemPageRoutingModule } from './item-routing.module';
 
 import { ItemPage } from './item.page';
 import { ItemdetailComponent } from './itemdetail/itemdetail.component';
+import { ItemimportComponent } from './itemimport/itemimport.component';
 
 import { QuillModule } from 'ngx-quill';
 import { ItemviewComponent } from './itemview/itemview.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { DragdropfileDirective } from 'src/app/directive/dragdropfile.directive';
+import { CircleProgressComponent } from 'src/app/components/circle-progress/circle-progress.component';
 
 @NgModule({
   imports: [
@@ -43,7 +46,10 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
   declarations: [
     ItemPage,
     ItemdetailComponent,
+    ItemimportComponent,
     ItemviewComponent,
+    DragdropfileDirective,
+    CircleProgressComponent,
   ]
 })
 export class ItemPageModule {}

@@ -162,6 +162,11 @@ ion-chip.activated {
   --color: #fff;
 }
 
+ion-chip.disabled{
+  --background: #b3b3b3;
+  --color: #fff;
+}
+
 .item-chip {
   --background: transparent;
   --padding-start: 0px;
@@ -180,4 +185,8 @@ ion-reorder {
 .accordion-header > ion-label {
   --color: #fff;
   font-weight: 600;  
+}
+
+.panelActivated {
+  --color: #68d3ff;
 }

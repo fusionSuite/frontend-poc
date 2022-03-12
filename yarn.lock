@@ -5542,6 +5542,13 @@ netmask@^2.0.1:
   resolved "https://registry.yarnpkg.com/netmask/-/netmask-2.0.2.tgz#8b01a07644065d536383835823bc52004ebac5e7"
   integrity sha512-dBpDMdxv9Irdq66304OLfEmQ9tbNRFnFTuZiLo+bD+r332bBmMJ8GBLXklIXXgxd3+v9+KUnZaUR5PJMa75Gsg==
 
+ngx-csv-parser@^0.0.7:
+  version "0.0.7"
+  resolved "https://registry.yarnpkg.com/ngx-csv-parser/-/ngx-csv-parser-0.0.7.tgz#08b4b36d045bba71deab0609665ed5062e98928f"
+  integrity sha512-KCos2rxjkPqw/gQfd+0TYnf4bWHY4zyC8G5JB09DEnHrHz2RReKgSccJO+4SzApG7O6asDtUV4qfa94/uZ10ZQ==
+  dependencies:
+    tslib "^1.10.0"
+
 ngx-quill@^16.1.2:
   version "16.1.2"
   resolved "https://registry.yarnpkg.com/ngx-quill/-/ngx-quill-16.1.2.tgz#577e8ae969855e41c64e8f605ab0ad37381ea061"
