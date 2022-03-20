@@ -1,0 +1,88 @@
+/*
+ * FusionSuite - Frontend
+ * Copyright (C) 2022 FusionSuite
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+
+ion-toolbar {
+  height: 95px;
+}
+
+.header-md::after {
+  background-image: none;
+}
+
+ion-toolbar {
+  --border-width: 0px;
+  --background: #f6f6f6;
+}
+
+ion-content {
+  --background: #f6f6f6;
+}
+
+ion-card {
+  margin-inline: 36px;
+  border-radius: 10px;
+  box-shadow: none;
+}
+
+ion-card-header {
+  --background: #0478a7;
+  --color: #fff;
+}
+
+.extra-large-button {
+  --background: #0478a7;
+  height: 500px;
+  border-radius: 8px;
+  max-width: 100%;
+  border: dashed 3px #0478a7;
+
+  ion-card-header {
+    height: 280px;
+    fa-layers {
+      position: unset;
+    }
+  }
+  ion-card-content {
+    color: #fff;
+    text-align: center;
+    height: 200px;
+    ion-label {
+      font-size: 18px;
+      font-weight: 600;
+    }
+    ion-grid {
+      height: 100%;
+      ion-row {
+        min-height: 37px;
+      }
+      fa-icon {
+        color: #68d3ff;
+      }
+    }
+  }
+}
+
+ion-checkbox {
+  --background-checked: #0478a7;
+  --border-radius: 5px;
+  --border-color: #0478a7;
+  --border-color-checked: #fff;
+}
+
+.fileover {
+  border: dashed 3px #68d3ff;
+}

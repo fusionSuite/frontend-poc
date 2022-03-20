@@ -43,8 +43,9 @@ export class AppComponent {
   initializeApp() {
     this.platform.ready()
     .then(() => this.login())
-    .then(() => this.backend.initialized.next(true))
     .then(() => this.getTypes())
+    .then(() => this.getUserparams())
+    .then(() => this.backend.initialized.next(true))
     .then(() => {
       this.statusBar.styleDefault();
       this.splashScreen.hide();
@@ -57,6 +58,10 @@ export class AppComponent {
 
   private async getTypes() {
     await this.backend.getTypes();
+  }
+
+  private async getUserparams() {
+    await this.backend.getUserparams();
   }
 
 }

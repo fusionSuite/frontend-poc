@@ -16,6 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import { Injectable } from '@angular/core';
+import { IUserparamsIds } from '../interfaces/UserparamsIds';
 
 @Injectable({
   providedIn: 'root'
@@ -23,6 +24,25 @@ import { Injectable } from '@angular/core';
 export class GlobalVarsService {
 
   public types :any[] = [];
+  public userparams :IUserparamsIds = {
+    itemlist: {
+      id: 0,
+      properties: {
+        typeId: 0,
+        elementsPerPage: 0,
+        propertiesOrder: 0,
+        propertieshidden: 0
+      }
+    },
+    csvimport: {
+      id: 0,
+      properties: {
+        typeId: 0,
+        mappingCols: 0,
+        joiningFields: 0
+      }
+    }  
+  };
 
   constructor() {
     this.types = [

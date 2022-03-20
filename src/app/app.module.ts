@@ -35,31 +35,31 @@ import { fab } from '@fortawesome/free-brands-svg-icons';
 import { SettingsService } from './services/settings.service';
 
 @NgModule({
-    declarations: [
-        AppComponent,
-        MenuComponent,
-    ],
-    imports: [
-        BrowserModule,
-        IonicModule.forRoot(),
-        AppRoutingModule,
-        HttpClientModule,
-        FontAwesomeModule,
-    ],
-    providers: [
-        StatusBar,
-        SplashScreen,
-        { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
-        BackendService,
-        HttpClient,
-        {
-          provide: APP_INITIALIZER,
-          useFactory: (setting: SettingsService) => function() {return setting.getSetting()},
-          deps: [SettingsService],
-          multi: true
-        },
-    ],
-    bootstrap: [AppComponent]
+  declarations: [
+    AppComponent,
+    MenuComponent,
+  ],
+  imports: [
+    BrowserModule,
+    IonicModule.forRoot(),
+    AppRoutingModule,
+    HttpClientModule,
+    FontAwesomeModule,
+  ],
+  providers: [
+    StatusBar,
+    SplashScreen,
+    { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
+    BackendService,
+    HttpClient,
+    {
+      provide: APP_INITIALIZER,
+      useFactory: (setting: SettingsService) => function() {return setting.getSetting()},
+      deps: [SettingsService],
+      multi: true
+    },
+  ],
+  bootstrap: [AppComponent]
 })
 export class AppModule {
   constructor(library: FaIconLibrary) {

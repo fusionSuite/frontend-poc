@@ -17,8 +17,14 @@
  */
 import { Component, OnInit } from '@angular/core';
 import { BackendService } from 'src/app/services/backend.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { ItemReorderEventDetail } from '@ionic/core';
+import { IProperty } from 'src/app/interfaces/Property';
+import { IListvalue } from 'src/app/interfaces/Listvalue';
+import { filter } from 'rxjs';
+import { GlobalVarsService } from 'src/app/services/global-vars.service';
+import { IItemCreate } from 'src/app/interfaces/ItemCreate';
+import { IType } from 'src/app/interfaces/Type';
 
 @Component({
   selector: 'app-item',
@@ -41,10 +47,14 @@ export class ItemPage implements OnInit {
   public currentPage = 1;
   public totalPages = 1;
   private propertiesOrder :any = [];
+  private userparamsId = 0;
+  private propertiesHidden :number[] = [];
 
   constructor(
     private backend: BackendService,
     private route: ActivatedRoute,
+    private router: Router,
+    private globalVars: GlobalVarsService
     ) {
 
   }
@@ -60,21 +70,36 @@ export class ItemPage implements OnInit {
         if (name !== null) {
           this.name = name;
         }
-        this.backend.getType(this.typeId)
-        .subscribe((res: any) => {
-          this.name = res['name'];
-          for (let prop of res['properties']) {
-            if (prop.valuetype === 'list') {
-              this.filtersClass[prop.id] = '';
-              if (prop.listvalues.length > 3) {
-                this.filtersClass[prop.id] = 'hideContent';
+
+        // Get userparams
+        if (this.globalVars.userparams.itemlist !== null) {
+          this.backend.getMyParams(this.globalVars.userparams.itemlist.id)
+          .subscribe((res :any) => {
+            for (let data of res.body) {
+              this.userparamsId = data.id;
+              for (let prop of data.properties) {
+                if (prop.name === 'elements per page') {
+                  this.itemsPerPage = prop.value.toString();
+                } else if (prop.name === 'property ids list (string)') {
+                  this.propertiesOrder = JSON.parse(prop.value);
+                } else if (prop.name === 'property ids hidden list (string)') {
+                  this.propertiesHidden = JSON.parse(prop.value);
+                }
               }
             }
-            this.propertiesOrder.push(prop.id);
-          }
-          this.properties = res['properties'];
-        });
-        this.getItems([{key: 'per_page', value: this.itemsPerPage}]);
+            this.getType();
+            this.getItems([{key: 'per_page', value: this.itemsPerPage}]);
+          });
+        } else {
+          this.getType();
+          this.getItems([{key: 'per_page', value: this.itemsPerPage}]);
+        }
+
+        this.router.events
+        .pipe(filter(event => event instanceof NavigationEnd))
+        .subscribe(res => {
+          this.getItems([{key: 'per_page', value: this.itemsPerPage}]);
+        });        
       }
     });
   }
@@ -83,20 +108,19 @@ export class ItemPage implements OnInit {
     this.getItems([{key: 'per_page', value: this.itemsPerPage}]);
   }
 
-  private async getItems(params :object[]) {
-    let res = await this.backend.getItems(this.typeId, params);
-    if (res !== undefined) {
-      this.parseGetItemsResponse(res);
-    }
-  }
 
   public getListProperties() {
     return <any>this.properties.filter((prop :any) => prop.valuetype === "list");
   }
 
-  public getItemPropertiesOrder(properties: Array<any>) {
+  public getItemPropertiesOrder(properties: IProperty[]) {
     properties.sort((a, b) => this.propertiesOrder.indexOf(a.id) - this.propertiesOrder.indexOf(b.id));
-    return properties;
+    let filteredProperties = properties.filter((k :IProperty) => this.propertiesHidden.indexOf(k.id) === -1);
+// TODO not sure IPropety is the right HERE
+    if (filteredProperties === undefined) {
+      return [];
+    }
+    return filteredProperties;
   }
 
   public reverseFilterClass(propId :number) {
@@ -178,6 +202,93 @@ export class ItemPage implements OnInit {
     return 'nav';
   }
 
+  public displayPropertyValue(prop: IProperty): string {
+    if (prop.valuetype === 'string') {
+      return prop.value;
+    } else if (prop.valuetype === 'list') {
+      if (prop.value === '') {
+        return '';
+      }
+      let val: IListvalue|undefined = prop.listvalues.find((listValue :IListvalue) => listValue.id === parseInt(prop.value));
+      if (val !== undefined) {
+        return val.value;
+      }
+    }
+    return '';
+  }
+
+  public saveParameters() {
+    if (this.globalVars.userparams.itemlist !== null) {
+      if (this.userparamsId > 0) {
+        this.backend.patchItemProperty(
+          this.userparamsId, 
+          this.globalVars.userparams.itemlist.properties.elementsPerPage, 
+          this.itemsPerPage)
+        .subscribe();
+        this.backend.patchItemProperty(
+          this.userparamsId, 
+          this.globalVars.userparams.itemlist.properties.propertiesOrder, 
+          JSON.stringify(this.propertiesOrder))
+        .subscribe();
+        this.backend.patchItemProperty(
+          this.userparamsId, 
+          this.globalVars.userparams.itemlist.properties.propertiesOrder, 
+          JSON.stringify(this.propertiesHidden))
+        .subscribe();
+      } else {
+        let data: IItemCreate = {
+          name: 'my param',
+          type_id: this.globalVars.userparams.itemlist.id,
+          properties: [
+            {
+              property_id: this.globalVars.userparams.itemlist.properties.typeId,
+              value: this.itemsPerPage
+            },
+            {
+              property_id: this.globalVars.userparams.itemlist.properties.propertiesOrder,
+              value: JSON.stringify(this.propertiesOrder)
+            },
+            {
+              property_id: this.globalVars.userparams.itemlist.properties.propertieshidden,
+              value: JSON.stringify(this.propertiesHidden)
+            }
+          ],
+        };
+        this.backend.createItem(data);
+      }
+    }
+  }
+
+  public toggleHideProperty(id :number) {
+    if (this.propertiesHidden.indexOf(id) !== -1) {
+      // find it, so delete id
+      let filterProp = this.propertiesHidden.filter(k => k !== id);
+      if (filterProp === undefined) {
+        this.propertiesHidden = [];
+      } else {
+        this.propertiesHidden = filterProp;
+      }
+    } else {
+      // not find it, so add it
+      this.propertiesHidden.push(id);
+    }
+  }
+
+  public getClassPropertyState(id :number) {
+    if (this.propertiesHidden.indexOf(id) !== -1) {
+      return 'disabled';
+    }
+    return 'activated';
+  }
+
+  public getPropertiesHeaders() {
+    let properties = this.properties.filter((k :IProperty) => this.propertiesHidden.indexOf(k.id) === -1);
+    if (properties === undefined) {
+      return [];
+    }
+    return properties;
+  }
+
   private parseGetItemsResponse(res: any)
   {
     let numberElements = res.headers.get('X-Total-Count');
@@ -198,4 +309,37 @@ export class ItemPage implements OnInit {
     this.items = res.body;
     this.items.sort((a :any, b :any) => (a.name > b.name) ? 1 : -1);
   }
+
+  private getType() {
+    this.backend.getType(this.typeId)
+    .subscribe((res: IType) => {
+      this.name = res['name'];
+      for (let prop of res['properties']) {
+        if (prop.valuetype === 'list') {
+          this.filtersClass[prop.id] = '';
+          if (prop.listvalues.length > 3) {
+            this.filtersClass[prop.id] = 'hideContent';
+          }
+        }
+        if (this.userparamsId === 0) {
+          this.propertiesOrder.push(prop.id);
+        }
+      }
+      console.log(res['properties']);
+      if (this.userparamsId > 0) {
+        // reorder the properties
+        const mapOrder = (order: any, key: any) => (a:any, b:any) => order.indexOf(a[key]) > order.indexOf(b[key]) ? 1 : -1;
+        res['properties'].sort(mapOrder(this.propertiesOrder, 'id'));
+      }
+      this.properties = res['properties'];
+    });
+  }
+
+  private async getItems(params :object[]) {
+    let res = await this.backend.getItems(this.typeId, params);
+    if (res !== undefined) {
+      this.parseGetItemsResponse(res);
+    }
+  }
+
 }

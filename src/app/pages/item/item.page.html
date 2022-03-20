@@ -19,14 +19,18 @@
   <ion-toolbar>
     <ion-grid style="padding-left: 12px;">
       <ion-row>
-        <ion-col size="2">
-          <ion-title class="page-title">{{name}}</ion-title>
+        <ion-col size="6">
+          <ion-title class="page-title">
+            {{name}}
+            <fa-icon [routerLink]="['detail/0']" [icon]="['fas', 'plus']" style="color: #0478a7; margin-left: 5px;cursor:pointer;"></fa-icon>
+            <fa-icon [routerLink]="['import']" [icon]="['fas', 'cloud-arrow-up']" style="color: #0478a7; margin-left: 5px;cursor:pointer;"></fa-icon>
+          </ion-title>
           <p *ngIf="numberElements != ''" style="padding-inline-start: 20px; color: #0478a7;font-size: 10px;">
             <fa-icon [icon]="['fas', 'quote-left']" size="xs" transform="up-8"></fa-icon>
             {{numberElements}} elements
           </p>
         </ion-col>
-        <ion-col size="10">
+        <ion-col size="6">
           <ion-searchbar [(ngModel)]="searchText" debounce="500" (keyup.enter)="search($event)"></ion-searchbar>
         </ion-col>
       </ion-row>
@@ -46,20 +50,20 @@
       <ion-grid>
         <ion-row class="row-header">
           <ion-col>
-            <ion-button fill="clear" (click)="setPanelType('filters')">
+            <ion-button fill="clear" (click)="setPanelType('filters')" [class.panelActivated] = "panelType === 'filters'">
               <fa-icon [icon]="['fas', 'filter']" size="lg"></fa-icon>
             </ion-button>
-            <ion-button fill="clear" (click)="setPanelType('bookmark')">
+            <ion-button fill="clear" (click)="setPanelType('bookmark')" [class.panelActivated] = "panelType === 'bookmark'">
               <fa-icon [icon]="['fas', 'bookmark']" size="lg"></fa-icon>
             </ion-button>
-            <ion-button fill="clear" (click)="setPanelType('savebookmark')">
+            <ion-button fill="clear" (click)="setPanelType('savebookmark')" [class.panelActivated] = "panelType === 'savebookmark'">
               <fa-icon [icon]="['fas', 'save']" size="lg"></fa-icon>
             </ion-button>
-            <ion-button fill="clear" (click)="setPanelType('parameters')">
+            <ion-button fill="clear" (click)="setPanelType('parameters')" [class.panelActivated] = "panelType === 'parameters'">
               <fa-icon [icon]="['fas', 'cogs']" size="lg"></fa-icon>
             </ion-button>
-            <ion-button fill="clear" (click)="setPanelType('export')">
-              <fa-icon [icon]="['fas', 'file-export']" size="lg"></fa-icon>
+            <ion-button fill="clear" (click)="setPanelType('export')" [class.panelActivated] = "panelType === 'export'">
+              <fa-icon [icon]="['fas', 'cloud-arrow-down']" size="lg"></fa-icon>
             </ion-button>
           </ion-col>
           <ion-col>
@@ -163,12 +167,30 @@
               <ion-card-content>
                 <ion-reorder-group disabled="false" (ionItemReorder)="doReorder($any($event))">
                   <ion-item *ngFor="let prop of properties" lines="none" class="item-chip">
-                    <ion-chip class="activated">
+                    <ion-chip [class]="getClassPropertyState(prop.id)" (click)="toggleHideProperty(prop.id)">
                       <ion-label>{{prop.name}}</ion-label>
                     </ion-chip>
                     <ion-reorder slot="end"></ion-reorder>
                   </ion-item>
                 </ion-reorder-group>
+                <ion-item lines="none" class="item-chip">
+                  <ion-label>Results per page</ion-label>
+                  <ion-select slot="end" interface="popover" [(ngModel)]="itemsPerPage" [value]="itemsPerPage" (ionChange)="reloadItems()" style="width: 60px;">
+                    <ion-select-option value="5">5</ion-select-option>
+                    <ion-select-option value="10">10</ion-select-option>
+                    <ion-select-option value="25">25</ion-select-option>
+                    <ion-select-option value="50">50</ion-select-option>
+                    <ion-select-option value="100">100</ion-select-option>
+                    <ion-select-option value="200">200</ion-select-option>
+                    <ion-select-option value="500">500</ion-select-option>
+                    <ion-select-option value="990">990</ion-select-option>
+                  </ion-select>
+                </ion-item>
+                <ion-item lines="none" class="item-chip">
+                  <ion-button expand="block" (click)="saveParameters()" style="--background: #0478a7; --color: #fff; --box-shadow: none; width: 100%;">
+                    Save
+                  </ion-button>
+                </ion-item>
               </ion-card-content>
             </ion-card>
 
@@ -182,18 +204,19 @@
             </ion-card>
           </ion-col>
           <ion-col>
+            <!-- Display header and lit of items -->
             <ion-list>
               <ion-list-header>
                 <ion-checkbox></ion-checkbox>
                 <ion-label>Name</ion-label>
-                <ion-label *ngFor="let prop of properties">{{prop.name}}</ion-label>
+                <ion-label *ngFor="let prop of getPropertiesHeaders()">{{prop.name}}</ion-label>
               </ion-list-header>
               <ion-item-group>
                 <ion-note *ngIf="items.length === 0">No items</ion-note>
-                <ion-item *ngFor="let item of items" [routerLink]="['view/' + item.id]" class="listitems">
+                <ion-item *ngFor="let item of items" [routerLink]="['detail/' + item.id]" class="listitems">
                   <ion-checkbox></ion-checkbox>
                   <ion-label>{{item.name}}</ion-label>
-                  <ion-label *ngFor="let prop of getItemPropertiesOrder(item.properties)">{{prop.value}}</ion-label>
+                  <ion-label *ngFor="let prop of getItemPropertiesOrder(item.properties)">{{displayPropertyValue(prop)}}</ion-label>
                 </ion-item>
               </ion-item-group>
             </ion-list>
